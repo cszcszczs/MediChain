@@ -22,6 +22,10 @@ export function LoginScreen({navigation}: props) {
   const [emailFocused, setEmailFocused] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
 
+  const handleLogin = () => {
+    navigation.navigate('Patient');
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
@@ -75,7 +79,7 @@ export function LoginScreen({navigation}: props) {
             {/* Botón */}
             <TouchableOpacity
               style={styles.button}
-              onPress={() => { }}
+              onPress={handleLogin}
               activeOpacity={0.85}
             >
               <Text style={styles.buttonText}>Iniciar Sesión</Text>

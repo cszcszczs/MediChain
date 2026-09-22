@@ -3,6 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { AppstackParamList } from '../types/navigation';
 import { LoginScreen } from '../screens/LoginScreen';
+import { PatientScreen } from '../screens/PatientScreen';
 
 const Stack = createNativeStackNavigator<AppstackParamList>();
 
@@ -13,6 +14,10 @@ export function AppNavigator() {
         <Stack.Screen
           name='Login'
           component={LoginScreen}
+        />
+        <Stack.Screen
+          name='Patient'
+          component={PatientScreen}
         />
       </Stack.Navigator>
     </NavigationContainer>
