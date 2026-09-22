@@ -8,52 +8,54 @@ import {
   ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Feather } from '@expo/vector-icons';
+import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { TextField } from '../components/TextField';
 import { SelectField } from '../components/SelectField';
 import { styles } from '../styles/PatientStyle';
-import { AppstackParamList } from '../types/navigation';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-const DOCUMENT_TYPES = ['DNI', 'Pasaporte', 'Cédula', 'Carné de Extranjería'];
-const GENDERS = ['Masculino', 'Femenino', 'Otro', 'Prefiero no decirlo'];
+const SPECIALTIES = [
+  'Medicina General',
+  'Pediatría',
+  'Cardiología',
+  'Cirugía General',
+  'Ginecología',
+  'Dermatología',
+  'Neurología',
+  'Psiquiatría',
+  'Ortopedia',
+  'Oftalmología',
+];
 
-type props = NativeStackScreenProps<AppstackParamList, 'Patient'>
+const USER_STATUSES = ['Activo', 'Inactivo', 'Suspendido'];
 
-export function PatientScreen( {navigation}: props) {
+export function ProfessionalScreen({ onSubmit, onCancel }) {
   const [nombres, setNombres] = useState('');
   const [apellidos, setApellidos] = useState('');
-  const [tipoDocumento, setTipoDocumento] = useState('');
   const [numeroDocumento, setNumeroDocumento] = useState('');
-  const [fechaNacimiento, setFechaNacimiento] = useState('');
-  const [genero, setGenero] = useState('');
-  const [correoElectronico, setCorreoElectronico] = useState('');
   const [telefono, setTelefono] = useState('');
-  const [ciudad, setCiudad] = useState('');
-  const [direccion, setDireccion] = useState('');
+  const [correoElectronico, setCorreoElectronico] = useState('');
+  const [especialidad, setEspecialidad] = useState('');
+  const [licenciaMedica, setLicenciaMedica] = useState('');
+  const [institucion, setInstitucion] = useState('');
+  const [estadoUsuario, setEstadoUsuario] = useState('Activo');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const goToProfessional = () => {
-    navigation.navigate("Professional")
-  }
-
-  /*const handleSubmit = () => {
+  const handleSubmit = () => {
     onSubmit?.({
       nombres,
       apellidos,
-      tipoDocumento,
       numeroDocumento,
-      fechaNacimiento,
-      genero,
-      correoElectronico,
       telefono,
-      ciudad,
-      direccion,
+      correoElectronico,
+      especialidad,
+      licenciaMedica,
+      institucion,
+      estadoUsuario,
       password,
       confirmPassword,
     });
-  };*/
+  };
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
@@ -65,9 +67,9 @@ export function PatientScreen( {navigation}: props) {
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
         >
-          <Text style={styles.title}>Registrar Nuevo Paciente</Text>
+          <Text style={styles.title}>Registrar Profesional de Salud</Text>
           <Text style={styles.subtitle}>
-            Complete el formulario para registrar un nuevo paciente
+            Complete el formulario para registrar un profesional médico
           </Text>
 
           {/* Tarjeta: Información Personal */}
@@ -84,7 +86,7 @@ export function PatientScreen( {navigation}: props) {
               required
               value={nombres}
               onChangeText={setNombres}
-              placeholder="Juan Carlos"
+              placeholder="María Elena"
             />
 
             <TextField
@@ -92,16 +94,7 @@ export function PatientScreen( {navigation}: props) {
               required
               value={apellidos}
               onChangeText={setApellidos}
-              placeholder="Pérez García"
-            />
-
-            <SelectField
-              label="Tipo Documento"
-              required
-              value={tipoDocumento}
-              placeholder="Seleccione..."
-              options={DOCUMENT_TYPES}
-              onSelect={setTipoDocumento}
+              placeholder="González Torres"
             />
 
             <TextField
@@ -115,44 +108,6 @@ export function PatientScreen( {navigation}: props) {
             />
 
             <TextField
-              label="Fecha de Nacimiento"
-              required
-              value={fechaNacimiento}
-              onChangeText={setFechaNacimiento}
-              placeholder="mm/dd/yyyy"
-              icon="calendar"
-            />
-
-            <SelectField
-              label="Género"
-              required
-              value={genero}
-              placeholder="Seleccione..."
-              options={GENDERS}
-              onSelect={setGenero}
-            />
-          </View>
-
-          {/* Tarjeta: Información de Contacto */}
-          <View style={styles.card}>
-            <View style={styles.cardHeader}>
-              <View style={styles.cardIconWrapper}>
-                <Feather name="mail" size={16} color="#2563EB" />
-              </View>
-              <Text style={styles.cardTitle}>Información de Contacto</Text>
-            </View>
-
-            <TextField
-              label="Correo Electrónico"
-              required
-              value={correoElectronico}
-              onChangeText={setCorreoElectronico}
-              placeholder="paciente@ejemplo.com"
-              icon="mail"
-              keyboardType="email-address"
-            />
-
-            <TextField
               label="Teléfono"
               required
               value={telefono}
@@ -163,18 +118,56 @@ export function PatientScreen( {navigation}: props) {
             />
 
             <TextField
-              label="Ciudad"
-              value={ciudad}
-              onChangeText={setCiudad}
-              placeholder="Lima"
+              label="Correo Electrónico"
+              required
+              value={correoElectronico}
+              onChangeText={setCorreoElectronico}
+              placeholder="doctor@hospital.com"
+              icon="mail"
+              keyboardType="email-address"
+            />
+          </View>
+
+          {/* Tarjeta: Información Profesional */}
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <View style={styles.cardIconWrapper}>
+                <MaterialCommunityIcons name="stethoscope" size={16} color="#2563EB" />
+              </View>
+              <Text style={styles.cardTitle}>Información Profesional</Text>
+            </View>
+
+            <SelectField
+              label="Especialidad"
+              required
+              value={especialidad}
+              placeholder="Seleccione..."
+              options={SPECIALTIES}
+              onSelect={setEspecialidad}
             />
 
             <TextField
-              label="Dirección"
-              value={direccion}
-              onChangeText={setDireccion}
-              placeholder="Av. Principal 123"
-              icon="map-pin"
+              label="N° Licencia Médica"
+              required
+              value={licenciaMedica}
+              onChangeText={setLicenciaMedica}
+              placeholder="CMP123456"
+              icon="award"
+            />
+
+            <TextField
+              label="Institución / Hospital"
+              value={institucion}
+              onChangeText={setInstitucion}
+              placeholder="Hospital Nacional Dos de Mayo"
+            />
+
+            <SelectField
+              label="Estado del Usuario"
+              value={estadoUsuario}
+              placeholder="Seleccione..."
+              options={USER_STATUSES}
+              onSelect={setEstadoUsuario}
             />
           </View>
 
@@ -211,29 +204,19 @@ export function PatientScreen( {navigation}: props) {
           {/* Botones */}
           <TouchableOpacity
             style={styles.submitButton}
-            onPress={() => {}}
+            onPress={handleSubmit}
             activeOpacity={0.85}
           >
-            <Text style={styles.submitButtonText}>Registrar Paciente</Text>
+            <Text style={styles.submitButtonText}>Registrar Profesional</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.cancelButton}
-            onPress={() => { }}
+            onPress={onCancel}
             activeOpacity={0.7}
           >
             <Text style={styles.cancelButtonText}>Cancelar</Text>
           </TouchableOpacity>
-
-          {/* BORRAR DESPUES */}
-          <TouchableOpacity
-            style={styles.submitButton}
-            onPress={goToProfessional}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.cancelButtonText}>Registrar Medico</Text>
-          </TouchableOpacity>
-
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
