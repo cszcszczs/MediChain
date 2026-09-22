@@ -216,6 +216,16 @@ export function PatientScreen({ onSubmit, onCancel }) {
           >
             <Text style={styles.cancelButtonText}>Cancelar</Text>
           </TouchableOpacity>
+
+          {/* BORRAR DESPUES */}
+          <TouchableOpacity
+            style={styles.submitButton}
+            onPress={() => { }}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.cancelButtonText}>Registrar Medico</Text>
+          </TouchableOpacity>
+
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
