@@ -23,6 +23,10 @@ export function PatientScreen({ onSubmit, onCancel }) {
   const [numeroDocumento, setNumeroDocumento] = useState('');
   const [fechaNacimiento, setFechaNacimiento] = useState('');
   const [genero, setGenero] = useState('');
+  const [correoElectronico, setCorreoElectronico] = useState('');
+  const [telefono, setTelefono] = useState('');
+  const [ciudad, setCiudad] = useState('');
+  const [direccion, setDireccion] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
@@ -34,6 +38,10 @@ export function PatientScreen({ onSubmit, onCancel }) {
       numeroDocumento,
       fechaNacimiento,
       genero,
+      correoElectronico,
+      telefono,
+      ciudad,
+      direccion,
       password,
       confirmPassword,
     });
@@ -54,9 +62,8 @@ export function PatientScreen({ onSubmit, onCancel }) {
             Complete el formulario para registrar un nuevo paciente
           </Text>
 
-          {/* Tarjeta única: ambas secciones + botones */}
+          {/* Tarjeta: Información Personal */}
           <View style={styles.card}>
-            {/* Sección: Información Personal */}
             <View style={styles.cardHeader}>
               <View style={styles.cardIconWrapper}>
                 <Feather name="user" size={16} color="#2563EB" />
@@ -116,11 +123,55 @@ export function PatientScreen({ onSubmit, onCancel }) {
               options={GENDERS}
               onSelect={setGenero}
             />
+          </View>
 
-            {/* Divisor entre secciones */}
-            <View style={styles.divider} />
+          {/* Tarjeta: Información de Contacto */}
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <View style={styles.cardIconWrapper}>
+                <Feather name="mail" size={16} color="#2563EB" />
+              </View>
+              <Text style={styles.cardTitle}>Información de Contacto</Text>
+            </View>
 
-            {/* Sección: Configuración de Acceso */}
+            <TextField
+              label="Correo Electrónico"
+              required
+              value={correoElectronico}
+              onChangeText={setCorreoElectronico}
+              placeholder="paciente@ejemplo.com"
+              icon="mail"
+              keyboardType="email-address"
+            />
+
+            <TextField
+              label="Teléfono"
+              required
+              value={telefono}
+              onChangeText={setTelefono}
+              placeholder="987654321"
+              icon="phone"
+              keyboardType="phone-pad"
+            />
+
+            <TextField
+              label="Ciudad"
+              value={ciudad}
+              onChangeText={setCiudad}
+              placeholder="Lima"
+            />
+
+            <TextField
+              label="Dirección"
+              value={direccion}
+              onChangeText={setDireccion}
+              placeholder="Av. Principal 123"
+              icon="map-pin"
+            />
+          </View>
+
+          {/* Tarjeta: Configuración de Acceso */}
+          <View style={styles.card}>
             <View style={styles.cardHeader}>
               <View style={styles.cardIconWrapper}>
                 <Feather name="lock" size={16} color="#2563EB" />
@@ -147,24 +198,24 @@ export function PatientScreen({ onSubmit, onCancel }) {
               icon="lock"
               secureTextEntry
             />
-
-            {/* Botones */}
-            <TouchableOpacity
-              style={styles.submitButton}
-              onPress={handleSubmit}
-              activeOpacity={0.85}
-            >
-              <Text style={styles.submitButtonText}>Registrar Paciente</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={onCancel}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.cancelButtonText}>Cancelar</Text>
-            </TouchableOpacity>
           </View>
+
+          {/* Botones */}
+          <TouchableOpacity
+            style={styles.submitButton}
+            onPress={handleSubmit}
+            activeOpacity={0.85}
+          >
+            <Text style={styles.submitButtonText}>Registrar Paciente</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.cancelButton}
+            onPress={onCancel}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.cancelButtonText}>Cancelar</Text>
+          </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
