@@ -6,6 +6,7 @@ import { LoginScreen } from '../screens/LoginScreen';
 import { PatientScreen } from '../screens/PatientScreen';
 import { ProfessionalScreen } from '../screens/ProfessionalScreen';
 import { HistoryScreen } from '../screens/HistoryScreen';
+import { PermissionsScreen } from '../screens/PermissionsScreen';
 
 const Stack = createNativeStackNavigator<AppstackParamList>();
 
@@ -28,6 +29,10 @@ export function AppNavigator() {
         <Stack.Screen
           name='History'
           component={HistoryScreen}
+        />
+        <Stack.Screen
+          name='Permissions'
+          component={PermissionsScreen}
         />
       </Stack.Navigator>
     </NavigationContainer>
