@@ -1,5 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text } from 'react-native';
+import { styles } from '../styles/StatusBadgeStyle';
+
 
 const STATUS_COLORS = {
   Activo: { bg: '#DCFCE7', text: '#16A34A' },
@@ -16,15 +18,3 @@ export function StatusBadge({ status }) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  badge: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 999,
-  },
-  text: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-});

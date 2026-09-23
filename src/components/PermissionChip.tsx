@@ -1,5 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text } from 'react-native';
+import { styles } from '../styles/PermissionChipStyle';
+
 
 export function PermissionChip({ label }) {
   return (
@@ -8,19 +10,3 @@ export function PermissionChip({ label }) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  chip: {
-    backgroundColor: '#EFF6FF',
-    borderRadius: 999,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    marginLeft: 6,
-    marginBottom: 6,
-  },
-  text: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#2563EB',
-  },
-});
