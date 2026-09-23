@@ -22,7 +22,7 @@ export function LoginScreen({navigation}: props) {
   const [emailFocused, setEmailFocused] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
 
-  const handleLogin = () => {
+  const goToPatient = () => {
     navigation.navigate('Patient');
   };
 
@@ -79,7 +79,7 @@ export function LoginScreen({navigation}: props) {
             {/* Botón */}
             <TouchableOpacity
               style={styles.button}
-              onPress={handleLogin}
+              onPress={goToPatient}
               activeOpacity={0.85}
             >
               <Text style={styles.buttonText}>Iniciar Sesión</Text>

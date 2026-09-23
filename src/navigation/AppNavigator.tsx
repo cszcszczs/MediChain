@@ -5,6 +5,7 @@ import { AppstackParamList } from '../types/navigation';
 import { LoginScreen } from '../screens/LoginScreen';
 import { PatientScreen } from '../screens/PatientScreen';
 import { ProfessionalScreen } from '../screens/ProfessionalScreen';
+import { HistoryScreen } from '../screens/HistoryScreen';
 
 const Stack = createNativeStackNavigator<AppstackParamList>();
 
@@ -23,6 +24,10 @@ export function AppNavigator() {
         <Stack.Screen
           name='Professional'
           component={ProfessionalScreen}
+        />
+        <Stack.Screen
+          name='History'
+          component={HistoryScreen}
         />
       </Stack.Navigator>
     </NavigationContainer>

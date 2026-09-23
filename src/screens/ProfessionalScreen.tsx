@@ -12,6 +12,8 @@ import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { TextField } from '../components/TextField';
 import { SelectField } from '../components/SelectField';
 import { styles } from '../styles/PatientStyle';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { AppstackParamList } from '../types/navigation';
 
 const SPECIALTIES = [
   'Medicina General',
@@ -28,7 +30,9 @@ const SPECIALTIES = [
 
 const USER_STATUSES = ['Activo', 'Inactivo', 'Suspendido'];
 
-export function ProfessionalScreen({ onSubmit, onCancel }) {
+type props = NativeStackScreenProps<AppstackParamList, 'Professional'>;
+
+export function ProfessionalScreen({ navigation }: props) {
   const [nombres, setNombres] = useState('');
   const [apellidos, setApellidos] = useState('');
   const [numeroDocumento, setNumeroDocumento] = useState('');
@@ -41,21 +45,25 @@ export function ProfessionalScreen({ onSubmit, onCancel }) {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const handleSubmit = () => {
-    onSubmit?.({
-      nombres,
-      apellidos,
-      numeroDocumento,
-      telefono,
-      correoElectronico,
-      especialidad,
-      licenciaMedica,
-      institucion,
-      estadoUsuario,
-      password,
-      confirmPassword,
-    });
-  };
+  const goToHistory = () => {
+   navigation.navigate("History")
+  }
+
+  //const handleSubmit = () => {
+  //  onSubmit?.({
+  //    nombres,
+  //    apellidos,
+  //    numeroDocumento,
+  //    telefono,
+  //    correoElectronico,
+  //    especialidad,
+  //    licenciaMedica,
+  //    institucion,
+  //    estadoUsuario,
+  //    password,
+  //    confirmPassword,
+  //  });
+  //};
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
@@ -204,7 +212,7 @@ export function ProfessionalScreen({ onSubmit, onCancel }) {
           {/* Botones */}
           <TouchableOpacity
             style={styles.submitButton}
-            onPress={handleSubmit}
+            onPress={() => {}}
             activeOpacity={0.85}
           >
             <Text style={styles.submitButtonText}>Registrar Profesional</Text>
@@ -212,11 +220,20 @@ export function ProfessionalScreen({ onSubmit, onCancel }) {
 
           <TouchableOpacity
             style={styles.cancelButton}
-            onPress={onCancel}
+            onPress={() => { }}
             activeOpacity={0.7}
           >
             <Text style={styles.cancelButtonText}>Cancelar</Text>
           </TouchableOpacity>
+
+          {/* BORRAR DESPUES */}
+                    <TouchableOpacity
+                      style={styles.submitButton}
+                      onPress={goToHistory}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={styles.cancelButtonText}>Crear historial</Text>
+                    </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
