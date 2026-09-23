@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -6,48 +6,48 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
-import { TextField } from '../components/TextField';
-import { SelectField } from '../components/SelectField';
-import { styles } from '../styles/PatientStyle';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { AppstackParamList } from '../types/navigation';
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
+import { TextField } from "../components/TextField";
+import { SelectField } from "../components/SelectField";
+import { styles } from "../styles/PatientStyle";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { AppstackParamList } from "../types/navigation";
 
 const SPECIALTIES = [
-  'Medicina General',
-  'Pediatría',
-  'Cardiología',
-  'Cirugía General',
-  'Ginecología',
-  'Dermatología',
-  'Neurología',
-  'Psiquiatría',
-  'Ortopedia',
-  'Oftalmología',
+  "Medicina General",
+  "Pediatría",
+  "Cardiología",
+  "Cirugía General",
+  "Ginecología",
+  "Dermatología",
+  "Neurología",
+  "Psiquiatría",
+  "Ortopedia",
+  "Oftalmología",
 ];
 
-const USER_STATUSES = ['Activo', 'Inactivo', 'Suspendido'];
+const USER_STATUSES = ["Activo", "Inactivo", "Suspendido"];
 
-type props = NativeStackScreenProps<AppstackParamList, 'Professional'>;
+type props = NativeStackScreenProps<AppstackParamList, "Professional">;
 
 export function ProfessionalScreen({ navigation }: props) {
-  const [nombres, setNombres] = useState('');
-  const [apellidos, setApellidos] = useState('');
-  const [numeroDocumento, setNumeroDocumento] = useState('');
-  const [telefono, setTelefono] = useState('');
-  const [correoElectronico, setCorreoElectronico] = useState('');
-  const [especialidad, setEspecialidad] = useState('');
-  const [licenciaMedica, setLicenciaMedica] = useState('');
-  const [institucion, setInstitucion] = useState('');
-  const [estadoUsuario, setEstadoUsuario] = useState('Activo');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [nombres, setNombres] = useState("");
+  const [apellidos, setApellidos] = useState("");
+  const [numeroDocumento, setNumeroDocumento] = useState("");
+  const [telefono, setTelefono] = useState("");
+  const [correoElectronico, setCorreoElectronico] = useState("");
+  const [especialidad, setEspecialidad] = useState("");
+  const [licenciaMedica, setLicenciaMedica] = useState("");
+  const [institucion, setInstitucion] = useState("");
+  const [estadoUsuario, setEstadoUsuario] = useState("Activo");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const goToHistory = () => {
-   navigation.navigate("History")
-  }
+    navigation.navigate("History");
+  };
 
   //const handleSubmit = () => {
   //  onSubmit?.({
@@ -66,10 +66,10 @@ export function ProfessionalScreen({ navigation }: props) {
   //};
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+    <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <ScrollView
           contentContainerStyle={styles.scrollContent}
@@ -140,7 +140,11 @@ export function ProfessionalScreen({ navigation }: props) {
           <View style={styles.card}>
             <View style={styles.cardHeader}>
               <View style={styles.cardIconWrapper}>
-                <MaterialCommunityIcons name="stethoscope" size={16} color="#2563EB" />
+                <MaterialCommunityIcons
+                  name="stethoscope"
+                  size={16}
+                  color="#2563EB"
+                />
               </View>
               <Text style={styles.cardTitle}>Información Profesional</Text>
             </View>
@@ -220,20 +224,20 @@ export function ProfessionalScreen({ navigation }: props) {
 
           <TouchableOpacity
             style={styles.cancelButton}
-            onPress={() => { }}
+            onPress={() => {}}
             activeOpacity={0.7}
           >
             <Text style={styles.cancelButtonText}>Cancelar</Text>
           </TouchableOpacity>
 
           {/* BORRAR DESPUES */}
-                    <TouchableOpacity
-                      style={styles.submitButton}
-                      onPress={goToHistory}
-                      activeOpacity={0.7}
-                    >
-                      <Text style={styles.cancelButtonText}>Crear historial</Text>
-                    </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.submitButton}
+            onPress={goToHistory}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.cancelButtonText}>Crear historial</Text>
+          </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

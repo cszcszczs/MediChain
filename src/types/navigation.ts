@@ -2,5 +2,6 @@ export type AppstackParamList = {
   Login: undefined;
   Patient: undefined;
   Professional: undefined;
-  History: undefined
+  History: undefined;
+  Permissions: undefined;
 };

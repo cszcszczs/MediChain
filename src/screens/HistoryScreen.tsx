@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -6,71 +6,76 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-} from 'react-native';
+} from "react-native";
 
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
-import { TextField } from '../components/TextField';
-import { TextAreaField } from '../components/TextAreaField';
-import { SelectField } from '../components/SelectField';
-import { styles } from '../styles/HistoryStyle';
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
+import { TextField } from "../components/TextField";
+import { TextAreaField } from "../components/TextAreaField";
+import { SelectField } from "../components/SelectField";
+import { styles } from "../styles/HistoryStyle";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { AppstackParamList } from "../types/navigation";
 
 let nextId = 1;
 const generateId = () => nextId++;
 
 // Lista de ejemplo
 const DEFAULT_ASSIGNED_PATIENTS = [
-  'Juan Pérez González',
-  'María Elena Torres',
-  'Carlos Ramírez Silva',
+  "Juan Pérez González",
+  "María Elena Torres",
+  "Carlos Ramírez Silva",
 ];
 
-export function HistoryScreen({
-  assignedPatients = DEFAULT_ASSIGNED_PATIENTS,
-  changeHistory = [
-    {
-      id: 'h1',
-      action: 'Registro creado',
-      author: 'Dr. María González',
-      date: '14 may 2026, 10:30 AM',
-    },
-  ],
-  onSubmit,
-  onCancel,
-  onUploadPress,
-}) {
+type props = NativeStackScreenProps<AppstackParamList, "Permissions">;
+
+export function HistoryScreen({ navigation }: props) {
+  const goToPermissions = () => {
+    navigation.navigate("Permissions");
+  };
+
+  const assignedPatients = DEFAULT_ASSIGNED_PATIENTS,
+    changeHistory = [
+      {
+        id: "h1",
+        action: "Registro creado",
+        author: "Dr. María González",
+        date: "14 may 2026, 10:30 AM",
+      },
+    ];
+
   // Información del paciente
-  const [pacienteSeleccionado, setPacienteSeleccionado] = useState('');
-  const [fechaConsulta, setFechaConsulta] = useState('');
+  const [pacienteSeleccionado, setPacienteSeleccionado] = useState("");
+  const [fechaConsulta, setFechaConsulta] = useState("");
 
   // Signos vitales
-  const [presionArterial, setPresionArterial] = useState('');
-  const [frecCardiaca, setFrecCardiaca] = useState('');
-  const [temperatura, setTemperatura] = useState('');
-  const [peso, setPeso] = useState('');
+  const [presionArterial, setPresionArterial] = useState("");
+  const [frecCardiaca, setFrecCardiaca] = useState("");
+  const [temperatura, setTemperatura] = useState("");
+  const [peso, setPeso] = useState("");
 
   // Diagnóstico y síntomas
-  const [sintomas, setSintomas] = useState('');
-  const [diagnostico, setDiagnostico] = useState('');
+  const [sintomas, setSintomas] = useState("");
+  const [diagnostico, setDiagnostico] = useState("");
 
   // Tratamiento
-  const [tratamiento, setTratamiento] = useState('');
+  const [tratamiento, setTratamiento] = useState("");
 
   // Medicamentos recetados (al menos uno visible por defecto)
   const [medicamentos, setMedicamentos] = useState([
-    { id: generateId(), nombre: '', dosis: '', frecuencia: '' },
+    { id: generateId(), nombre: "", dosis: "", frecuencia: "" },
   ]);
 
   const addMedicamento = () => {
     setMedicamentos((prev) => [
       ...prev,
-      { id: generateId(), nombre: '', dosis: '', frecuencia: '' },
+      { id: generateId(), nombre: "", dosis: "", frecuencia: "" },
     ]);
   };
 
   const updateMedicamento = (id, field, value) => {
     setMedicamentos((prev) =>
-      prev.map((m) => (m.id === id ? { ...m, [field]: value } : m))
+      prev.map((m) => (m.id === id ? { ...m, [field]: value } : m)),
     );
   };
 
@@ -84,13 +89,13 @@ export function HistoryScreen({
   const addExamen = () => {
     setExamenes((prev) => [
       ...prev,
-      { id: generateId(), nombre: '', resultado: '' },
+      { id: generateId(), nombre: "", resultado: "" },
     ]);
   };
 
   const updateExamen = (id, field, value) => {
     setExamenes((prev) =>
-      prev.map((e) => (e.id === id ? { ...e, [field]: value } : e))
+      prev.map((e) => (e.id === id ? { ...e, [field]: value } : e)),
     );
   };
 
@@ -104,35 +109,35 @@ export function HistoryScreen({
   const handleUploadPress = () => {
     // Aquí se integraría un selector de archivos
     // expo-document-picker. De momento solo delega al padre.
-    onUploadPress?.((file) => setArchivos((prev) => [...prev, file]));
+    //onUploadPress?.((file) => setArchivos((prev) => [...prev, file]));
   };
 
   // Notas adicionales
-  const [notasAdicionales, setNotasAdicionales] = useState('');
+  const [notasAdicionales, setNotasAdicionales] = useState("");
 
-  const handleSubmit = () => {
-    onSubmit?.({
-      pacienteSeleccionado,
-      fechaConsulta,
-      presionArterial,
-      frecCardiaca,
-      temperatura,
-      peso,
-      sintomas,
-      diagnostico,
-      tratamiento,
-      medicamentos,
-      examenes,
-      archivos,
-      notasAdicionales,
-    });
-  };
+  //const handleSubmit = () => {
+  //  onSubmit?.({
+  //    pacienteSeleccionado,
+  //    fechaConsulta,
+  //    presionArterial,
+  //    frecCardiaca,
+  //    temperatura,
+  //    peso,
+  //    sintomas,
+  //    diagnostico,
+  //    tratamiento,
+  //    medicamentos,
+  //    examenes,
+  //    archivos,
+  //    notasAdicionales,
+  //  });
+  //};
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+    <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <ScrollView
           contentContainerStyle={styles.scrollContent}
@@ -259,7 +264,11 @@ export function HistoryScreen({
             <View style={styles.cardHeaderRow}>
               <View style={styles.cardHeaderLeft}>
                 <View style={styles.cardIconWrapper}>
-                  <MaterialCommunityIcons name="pill" size={16} color="#2563EB" />
+                  <MaterialCommunityIcons
+                    name="pill"
+                    size={16}
+                    color="#2563EB"
+                  />
                 </View>
                 <Text style={styles.cardTitle}>Medicamentos Recetados</Text>
               </View>
@@ -281,7 +290,7 @@ export function HistoryScreen({
 
                 <TextField
                   value={med.nombre}
-                  onChangeText={(v) => updateMedicamento(med.id, 'nombre', v)}
+                  onChangeText={(v) => updateMedicamento(med.id, "nombre", v)}
                   placeholder="Nombre del medicamento"
                 />
 
@@ -289,7 +298,9 @@ export function HistoryScreen({
                   <View style={styles.halfField}>
                     <TextField
                       value={med.dosis}
-                      onChangeText={(v) => updateMedicamento(med.id, 'dosis', v)}
+                      onChangeText={(v) =>
+                        updateMedicamento(med.id, "dosis", v)
+                      }
                       placeholder="Dosis (500mg)"
                     />
                   </View>
@@ -297,7 +308,7 @@ export function HistoryScreen({
                     <TextField
                       value={med.frecuencia}
                       onChangeText={(v) =>
-                        updateMedicamento(med.id, 'frecuencia', v)
+                        updateMedicamento(med.id, "frecuencia", v)
                       }
                       placeholder="Frecuencia"
                     />
@@ -339,12 +350,12 @@ export function HistoryScreen({
 
                   <TextField
                     value={exam.nombre}
-                    onChangeText={(v) => updateExamen(exam.id, 'nombre', v)}
+                    onChangeText={(v) => updateExamen(exam.id, "nombre", v)}
                     placeholder="Nombre del examen"
                   />
                   <TextField
                     value={exam.resultado}
-                    onChangeText={(v) => updateExamen(exam.id, 'resultado', v)}
+                    onChangeText={(v) => updateExamen(exam.id, "resultado", v)}
                     placeholder="Resultado"
                   />
                 </View>
@@ -422,7 +433,7 @@ export function HistoryScreen({
           {/* Botones */}
           <TouchableOpacity
             style={styles.submitButton}
-            onPress={handleSubmit}
+            onPress={() => {}}
             activeOpacity={0.85}
           >
             <Feather
@@ -436,10 +447,18 @@ export function HistoryScreen({
 
           <TouchableOpacity
             style={styles.cancelButton}
-            onPress={onCancel}
+            onPress={() => {}}
             activeOpacity={0.7}
           >
             <Text style={styles.cancelButtonText}>Cancelar</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.submitButton}
+            onPress={goToPermissions}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.cancelButtonText}>Gestionar Permisos</Text>
           </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
