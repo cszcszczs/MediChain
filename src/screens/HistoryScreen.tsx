@@ -6,47 +6,48 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  ActivityIndicator,
 } from "react-native";
 
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
+import * as DocumentPicker from "expo-document-picker";
+import type { DocumentPickerAsset } from "expo-document-picker";
 import { TextField } from "../components/TextField";
 import { TextAreaField } from "../components/TextAreaField";
 import { SelectField } from "../components/SelectField";
 import { styles } from "../styles/HistoryStyle";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AppstackParamList } from "../types/navigation";
+import { usePatients } from "../hooks/usePatients";
+import { createHistory } from "../services/history";
+import { prepareHistory } from "../utils/historyForm";
+
+type props = NativeStackScreenProps<AppstackParamList, "History">;
+type MedicationFormEntry = {
+  id: number;
+  nombre: string;
+  dosis: string;
+  frecuencia: string;
+};
+type ExamFormEntry = {
+  id: number;
+  nombre: string;
+  resultado: string;
+};
 
 let nextId = 1;
 const generateId = () => nextId++;
 
-// Lista de ejemplo
-const DEFAULT_ASSIGNED_PATIENTS = [
-  "Juan Pérez González",
-  "María Elena Torres",
-  "Carlos Ramírez Silva",
-];
-
-type props = NativeStackScreenProps<AppstackParamList, "Permissions">;
-
 export function HistoryScreen({ navigation }: props) {
-  const goToPermissions = () => {
-    navigation.navigate("Permissions");
-  };
-
-  const assignedPatients = DEFAULT_ASSIGNED_PATIENTS,
-    changeHistory = [
-      {
-        id: "h1",
-        action: "Registro creado",
-        author: "Dr. María González",
-        date: "14 may 2026, 10:30 AM",
-      },
-    ];
+  const { patients, isLoading: isLoadingPatients, error: patientError, refresh } =
+    usePatients();
 
   // Información del paciente
   const [pacienteSeleccionado, setPacienteSeleccionado] = useState("");
-  const [fechaConsulta, setFechaConsulta] = useState("");
+  const [fechaConsulta, setFechaConsulta] = useState(
+    new Date().toISOString().slice(0, 10),
+  );
 
   // Signos vitales
   const [presionArterial, setPresionArterial] = useState("");
@@ -62,9 +63,15 @@ export function HistoryScreen({ navigation }: props) {
   const [tratamiento, setTratamiento] = useState("");
 
   // Medicamentos recetados (al menos uno visible por defecto)
-  const [medicamentos, setMedicamentos] = useState([
+  const [medicamentos, setMedicamentos] = useState<MedicationFormEntry[]>([
     { id: generateId(), nombre: "", dosis: "", frecuencia: "" },
   ]);
+  const [examenes, setExamenes] = useState<ExamFormEntry[]>([]);
+  const [archivos, setArchivos] = useState<DocumentPickerAsset[]>([]);
+  const [notasAdicionales, setNotasAdicionales] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   const addMedicamento = () => {
     setMedicamentos((prev) => [
@@ -73,18 +80,19 @@ export function HistoryScreen({ navigation }: props) {
     ]);
   };
 
-  const updateMedicamento = (id, field, value) => {
+  const updateMedicamento = (
+    id: number,
+    field: "nombre" | "dosis" | "frecuencia",
+    value: string,
+  ) => {
     setMedicamentos((prev) =>
       prev.map((m) => (m.id === id ? { ...m, [field]: value } : m)),
     );
   };
 
-  const removeMedicamento = (id) => {
+  const removeMedicamento = (id: number) => {
     setMedicamentos((prev) => prev.filter((m) => m.id !== id));
   };
-
-  // Resultados de exámenes (vacío por defecto)
-  const [examenes, setExamenes] = useState([]);
 
   const addExamen = () => {
     setExamenes((prev) => [
@@ -93,45 +101,103 @@ export function HistoryScreen({ navigation }: props) {
     ]);
   };
 
-  const updateExamen = (id, field, value) => {
+  const updateExamen = (
+    id: number,
+    field: "nombre" | "resultado",
+    value: string,
+  ) => {
     setExamenes((prev) =>
       prev.map((e) => (e.id === id ? { ...e, [field]: value } : e)),
     );
   };
 
-  const removeExamen = (id) => {
+  const removeExamen = (id: number) => {
     setExamenes((prev) => prev.filter((e) => e.id !== id));
   };
 
-  // Archivos adjuntos
-  const [archivos, setArchivos] = useState([]);
+  const handleUploadPress = async () => {
+    setErrorMessage("");
 
-  const handleUploadPress = () => {
-    // Aquí se integraría un selector de archivos
-    // expo-document-picker. De momento solo delega al padre.
-    //onUploadPress?.((file) => setArchivos((prev) => [...prev, file]));
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: ["application/pdf", "image/jpeg", "image/png"],
+        multiple: true,
+        copyToCacheDirectory: true,
+      });
+
+      if (result.canceled) {
+        return;
+      }
+
+      if (archivos.length + result.assets.length > 5) {
+        setErrorMessage("Puedes adjuntar un máximo de 5 archivos.");
+        return;
+      }
+
+      const oversizedFile = result.assets.find(
+        (asset) => asset.size !== undefined && asset.size > 10 * 1024 * 1024,
+      );
+      if (oversizedFile) {
+        setErrorMessage(`El archivo "${oversizedFile.name}" supera el límite de 10 MB.`);
+        return;
+      }
+
+      setArchivos((current) => [...current, ...result.assets]);
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : "No se pudieron seleccionar los archivos.",
+      );
+    }
   };
 
-  // Notas adicionales
-  const [notasAdicionales, setNotasAdicionales] = useState("");
+  const handleSubmit = async () => {
+    const form = prepareHistory(
+      {
+        patientId: pacienteSeleccionado,
+        consultationDate: fechaConsulta,
+        symptoms: sintomas,
+        diagnosis: diagnostico,
+        treatment: tratamiento,
+        bloodPressure: presionArterial,
+        heartRate: frecCardiaca,
+        temperature: temperatura,
+        weight: peso,
+        medications: medicamentos,
+        exams: examenes,
+        notes: notasAdicionales,
+      },
+      archivos,
+    );
 
-  //const handleSubmit = () => {
-  //  onSubmit?.({
-  //    pacienteSeleccionado,
-  //    fechaConsulta,
-  //    presionArterial,
-  //    frecCardiaca,
-  //    temperatura,
-  //    peso,
-  //    sintomas,
-  //    diagnostico,
-  //    tratamiento,
-  //    medicamentos,
-  //    examenes,
-  //    archivos,
-  //    notasAdicionales,
-  //  });
-  //};
+    if (!form.success) {
+      setErrorMessage(form.error);
+      setSuccessMessage("");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setErrorMessage("");
+    setSuccessMessage("");
+
+    try {
+      await createHistory(form.data, archivos);
+      setSuccessMessage("El historial clínico se guardó correctamente.");
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : "Ocurrió un error inesperado al guardar el historial.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const removeAttachment = (uri: string) => {
+    setArchivos((current) => current.filter((file) => file.uri !== uri));
+  };
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
@@ -148,6 +214,27 @@ export function HistoryScreen({ navigation }: props) {
             Crear o actualizar el historial médico del paciente
           </Text>
 
+          {patientError ? (
+            <View>
+              <Text accessibilityRole="alert" style={styles.errorMessage}>
+                {patientError}
+              </Text>
+              <TouchableOpacity onPress={() => void refresh()}>
+                <Text style={styles.addLink}>Reintentar carga de pacientes</Text>
+              </TouchableOpacity>
+            </View>
+          ) : null}
+          {errorMessage ? (
+            <Text accessibilityRole="alert" style={styles.errorMessage}>
+              {errorMessage}
+            </Text>
+          ) : null}
+          {successMessage ? (
+            <Text accessibilityRole="alert" style={styles.successMessage}>
+              {successMessage}
+            </Text>
+          ) : null}
+
           {/* Tarjeta: Información del Paciente */}
           <View style={styles.card}>
             <View style={styles.cardHeader}>
@@ -161,16 +248,24 @@ export function HistoryScreen({ navigation }: props) {
               label="Paciente"
               required
               value={pacienteSeleccionado}
-              placeholder="Seleccione un paciente..."
-              options={assignedPatients}
+              placeholder={
+                isLoadingPatients
+                  ? "Cargando pacientes..."
+                  : "Seleccione un paciente..."
+              }
+              options={patients.map((patient) => ({
+                label: patient.name,
+                value: patient.id,
+              }))}
               onSelect={setPacienteSeleccionado}
             />
 
             <TextField
               label="Fecha de Consulta"
+              required
               value={fechaConsulta}
               onChangeText={setFechaConsulta}
-              placeholder="mm/dd/yyyy"
+              placeholder="AAAA-MM-DD"
               icon="calendar"
             />
           </View>
@@ -381,19 +476,30 @@ export function HistoryScreen({ navigation }: props) {
               style={styles.uploadBox}
               activeOpacity={0.7}
               onPress={handleUploadPress}
+              disabled={isSubmitting || archivos.length >= 5}
             >
               <Feather name="upload-cloud" size={22} color="#9CA3AF" />
               <Text style={styles.uploadText}>
-                Toca "Subir" para adjuntar archivos
+                {archivos.length >= 5
+                  ? "Límite de 5 archivos alcanzado"
+                  : `Toca "Subir" para adjuntar archivos (${archivos.length}/5)`}
               </Text>
             </TouchableOpacity>
 
-            {archivos.map((file, index) => (
-              <View key={`${file}-${index}`} style={styles.attachedFileRow}>
-                <Text style={styles.attachedFileName} numberOfLines={1}>
-                  {file}
-                </Text>
-                <Feather name="paperclip" size={14} color="#6B7280" />
+            {archivos.map((file) => (
+              <View key={file.uri} style={styles.attachedFileRow}>
+                <View style={styles.attachedFileInfo}>
+                  <Feather name="paperclip" size={14} color="#6B7280" />
+                  <Text style={styles.attachedFileName} numberOfLines={1}>
+                    {file.name}
+                  </Text>
+                </View>
+                <TouchableOpacity
+                  onPress={() => removeAttachment(file.uri)}
+                  disabled={isSubmitting}
+                >
+                  <Text style={styles.removeLink}>Eliminar</Text>
+                </TouchableOpacity>
               </View>
             ))}
           </View>
@@ -408,46 +514,31 @@ export function HistoryScreen({ navigation }: props) {
             />
           </View>
 
-          {/* Tarjeta: Historial de Cambios */}
-          <View style={styles.card}>
-            <View style={styles.cardHeader}>
-              <View style={styles.cardIconWrapper}>
-                <Feather name="clock" size={16} color="#2563EB" />
-              </View>
-              <Text style={styles.cardTitle}>Historial de Cambios</Text>
-            </View>
-
-            {changeHistory.map((entry) => (
-              <View key={entry.id} style={styles.timelineItem}>
-                <View style={styles.timelineDot} />
-                <View>
-                  <Text style={styles.timelineAction}>{entry.action}</Text>
-                  <Text style={styles.timelineMeta}>
-                    {entry.author} · {entry.date}
-                  </Text>
-                </View>
-              </View>
-            ))}
-          </View>
-
           {/* Botones */}
           <TouchableOpacity
             style={styles.submitButton}
-            onPress={() => {}}
+            onPress={handleSubmit}
+            disabled={isSubmitting || isLoadingPatients}
             activeOpacity={0.85}
           >
-            <Feather
-              name="save"
-              size={16}
-              color="#FFFFFF"
-              style={styles.submitButtonIcon}
-            />
-            <Text style={styles.submitButtonText}>Guardar Historial</Text>
+            {isSubmitting ? (
+              <ActivityIndicator color="#FFFFFF" />
+            ) : (
+              <>
+                <Feather
+                  name="save"
+                  size={16}
+                  color="#FFFFFF"
+                  style={styles.submitButtonIcon}
+                />
+                <Text style={styles.submitButtonText}>Guardar Historial</Text>
+              </>
+            )}
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.cancelButton}
-            onPress={() => {}}
+            onPress={() => navigation.goBack()}
             activeOpacity={0.7}
           >
             <Text style={styles.cancelButtonText}>Cancelar</Text>
@@ -455,7 +546,7 @@ export function HistoryScreen({ navigation }: props) {
 
           <TouchableOpacity
             style={styles.submitButton}
-            onPress={goToPermissions}
+            onPress={() => navigation.navigate("Permissions")}
             activeOpacity={0.7}
           >
             <Text style={styles.cancelButtonText}>Gestionar Permisos</Text>

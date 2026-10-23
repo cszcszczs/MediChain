@@ -65,6 +65,18 @@ function parsePatientResponse(payload: unknown): PatientResponseDTO {
   };
 }
 
+function parsePatientList(payload: unknown): PatientResponseDTO[] {
+  if (!Array.isArray(payload)) {
+    throw new Error("El backend devolvió una lista de pacientes inválida.");
+  }
+
+  return payload.map(parsePatientResponse);
+}
+
+export function listPatients(): Promise<PatientResponseDTO[]> {
+  return apiRequest("patient", parsePatientList);
+}
+
 export function createPatient(
   patient: CreatePatientDTO,
 ): Promise<PatientResponseDTO> {

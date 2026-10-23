@@ -20,6 +20,18 @@ export const styles = StyleSheet.create({
     color: '#6B7280',
     marginBottom: 18,
   },
+  errorMessage: {
+    color: '#B91C1C',
+    fontSize: 13,
+    lineHeight: 18,
+    marginBottom: 12,
+  },
+  successMessage: {
+    color: '#15803D',
+    fontSize: 13,
+    lineHeight: 18,
+    marginBottom: 12,
+  },
 
   // Tarjetas
   card: {
@@ -122,10 +134,17 @@ export const styles = StyleSheet.create({
     borderRadius: 8,
     marginTop: 10,
   },
+  attachedFileInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    marginRight: 12,
+  },
   attachedFileName: {
     fontSize: 13,
     color: '#374151',
     flexShrink: 1,
+    marginLeft: 8,
   },
 
   // Bloques repetibles (Medicamento N, Examen N)
