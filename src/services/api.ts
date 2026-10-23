@@ -18,6 +18,7 @@ export class ApiError extends Error {
 
 export interface ApiRequestOptions extends RequestInit {
   authenticated?: boolean;
+  allowEmptyResponse?: boolean;
 }
 
 export async function saveAccessToken(token: string): Promise<void> {
@@ -86,7 +87,11 @@ export async function apiRequest<T>(
     );
   }
 
-  const { authenticated = true, ...requestInit } = options;
+  const {
+    authenticated = true,
+    allowEmptyResponse = false,
+    ...requestInit
+  } = options;
   const headers = new Headers(requestInit.headers);
   headers.set("Accept", "application/json");
 
@@ -130,6 +135,10 @@ export async function apiRequest<T>(
   }
 
   if (payload === null) {
+    if (allowEmptyResponse) {
+      return parseResponse(null);
+    }
+
     throw new ApiError("El backend respondió sin contenido.", response.status);
   }
 

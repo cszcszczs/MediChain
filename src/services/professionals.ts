@@ -118,6 +118,18 @@ function parseProfessionalResponse(payload: unknown): ProfessionalResponseDTO {
   };
 }
 
+function parseProfessionalList(payload: unknown): ProfessionalResponseDTO[] {
+  if (!Array.isArray(payload)) {
+    throw new Error("El backend devolvió una lista de profesionales inválida.");
+  }
+
+  return payload.map(parseProfessionalResponse);
+}
+
+export function listProfessionals(): Promise<ProfessionalResponseDTO[]> {
+  return apiRequest("professional", parseProfessionalList);
+}
+
 export function createProfessional(
   professional: CreateProfessionalDTO,
 ): Promise<ProfessionalResponseDTO> {

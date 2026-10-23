@@ -2,8 +2,14 @@ import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { styles } from '../styles/CheckboxRowStyle';
 
+interface CheckboxRowProps {
+  label: string;
+  checked: boolean;
+  onToggle: () => void;
+}
+
 // Checkbox en forma de fila/píldora, con cuadro que se rellena al marcar.
-export function CheckboxRow({ label, checked, onToggle }) {
+export function CheckboxRow({ label, checked, onToggle }: CheckboxRowProps) {
   return (
     <TouchableOpacity
       style={styles.wrapper}
