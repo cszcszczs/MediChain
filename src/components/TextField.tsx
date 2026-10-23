@@ -1,7 +1,20 @@
 import { useState } from 'react';
-import { View, Text, TextInput  } from 'react-native';
+import { View, Text, TextInput } from 'react-native';
+import type { KeyboardTypeOptions } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import type { ComponentProps } from 'react';
 import { styles } from '../styles/TextFieldStyle';
+
+interface TextFieldProps {
+  label?: string;
+  required?: boolean;
+  value: string;
+  onChangeText: (value: string) => void;
+  placeholder?: string;
+  icon?: ComponentProps<typeof Feather>['name'];
+  secureTextEntry?: boolean;
+  keyboardType?: KeyboardTypeOptions;
+}
 
 export function TextField({
   label,
@@ -12,7 +25,7 @@ export function TextField({
   icon,
   secureTextEntry,
   keyboardType,
-}) {
+}: TextFieldProps) {
   const [focused, setFocused] = useState(false);
 
   return (

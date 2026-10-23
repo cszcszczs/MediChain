@@ -6,6 +6,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
@@ -14,13 +15,16 @@ import { SelectField } from '../components/SelectField';
 import { styles } from '../styles/PatientStyle';
 import { AppstackParamList } from '../types/navigation';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-
-const DOCUMENT_TYPES = ['DNI', 'Pasaporte', 'Cédula', 'Carné de Extranjería'];
-const GENDERS = ['Masculino', 'Femenino', 'Otro', 'Prefiero no decirlo'];
+import { createPatient } from '../services/patients';
+import {
+  DOCUMENT_TYPES,
+  GENDERS,
+  preparePatientRegistration,
+} from '../utils/patientForm';
 
 type props = NativeStackScreenProps<AppstackParamList, 'Patient'>
 
-export function PatientScreen( {navigation}: props) {
+export function PatientScreen({ navigation }: props) {
   const [nombres, setNombres] = useState('');
   const [apellidos, setApellidos] = useState('');
   const [tipoDocumento, setTipoDocumento] = useState('');
@@ -33,13 +37,16 @@ export function PatientScreen( {navigation}: props) {
   const [direccion, setDireccion] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
   const goToProfessional = () => {
     navigation.navigate("Professional")
   }
 
-  /*const handleSubmit = () => {
-    onSubmit?.({
+  const handleSubmit = async () => {
+    const registration = preparePatientRegistration({
       nombres,
       apellidos,
       tipoDocumento,
@@ -53,7 +60,32 @@ export function PatientScreen( {navigation}: props) {
       password,
       confirmPassword,
     });
-  };*/
+
+    if (!registration.success) {
+      setErrorMessage(registration.error);
+      setSuccessMessage('');
+      return;
+    }
+
+    setIsSubmitting(true);
+    setErrorMessage('');
+    setSuccessMessage('');
+
+    try {
+      const createdPatient = await createPatient(registration.data);
+      setSuccessMessage(`Paciente ${createdPatient.name} registrado correctamente.`);
+      setPassword('');
+      setConfirmPassword('');
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : 'Ocurrió un error inesperado al registrar al paciente.',
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
@@ -69,6 +101,17 @@ export function PatientScreen( {navigation}: props) {
           <Text style={styles.subtitle}>
             Complete el formulario para registrar un nuevo paciente
           </Text>
+
+          {errorMessage ? (
+            <Text accessibilityRole="alert" style={styles.errorMessage}>
+              {errorMessage}
+            </Text>
+          ) : null}
+          {successMessage ? (
+            <Text accessibilityRole="alert" style={styles.successMessage}>
+              {successMessage}
+            </Text>
+          ) : null}
 
           {/* Tarjeta: Información Personal */}
           <View style={styles.card}>
@@ -119,7 +162,7 @@ export function PatientScreen( {navigation}: props) {
               required
               value={fechaNacimiento}
               onChangeText={setFechaNacimiento}
-              placeholder="mm/dd/yyyy"
+              placeholder="AAAA-MM-DD"
               icon="calendar"
             />
 
@@ -164,6 +207,7 @@ export function PatientScreen( {navigation}: props) {
 
             <TextField
               label="Ciudad"
+              required
               value={ciudad}
               onChangeText={setCiudad}
               placeholder="Lima"
@@ -171,6 +215,7 @@ export function PatientScreen( {navigation}: props) {
 
             <TextField
               label="Dirección"
+              required
               value={direccion}
               onChangeText={setDireccion}
               placeholder="Av. Principal 123"
@@ -211,27 +256,31 @@ export function PatientScreen( {navigation}: props) {
           {/* Botones */}
           <TouchableOpacity
             style={styles.submitButton}
-            onPress={() => {}}
+            onPress={handleSubmit}
+            disabled={isSubmitting}
             activeOpacity={0.85}
           >
-            <Text style={styles.submitButtonText}>Registrar Paciente</Text>
+            {isSubmitting ? (
+              <ActivityIndicator color="#FFFFFF" />
+            ) : (
+              <Text style={styles.submitButtonText}>Registrar Paciente</Text>
+            )}
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.cancelButton}
-            onPress={() => { }}
+            onPress={() => navigation.goBack()}
             activeOpacity={0.7}
           >
             <Text style={styles.cancelButtonText}>Cancelar</Text>
           </TouchableOpacity>
 
-          {/* BORRAR DESPUES */}
           <TouchableOpacity
             style={styles.submitButton}
             onPress={goToProfessional}
             activeOpacity={0.7}
           >
-            <Text style={styles.cancelButtonText}>Registrar Medico</Text>
+            <Text style={styles.cancelButtonText}>Registrar Médico</Text>
           </TouchableOpacity>
 
         </ScrollView>
