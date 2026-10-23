@@ -6,6 +6,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
@@ -14,56 +15,73 @@ import { SelectField } from "../components/SelectField";
 import { styles } from "../styles/PatientStyle";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AppstackParamList } from "../types/navigation";
-
-const SPECIALTIES = [
-  "Medicina General",
-  "Pediatría",
-  "Cardiología",
-  "Cirugía General",
-  "Ginecología",
-  "Dermatología",
-  "Neurología",
-  "Psiquiatría",
-  "Ortopedia",
-  "Oftalmología",
-];
-
-const USER_STATUSES = ["Activo", "Inactivo", "Suspendido"];
+import { createProfessional } from "../services/professionals";
+import {
+  prepareProfessionalRegistration,
+  PROFESSIONAL_DOCUMENT_TYPES,
+  PROFESSIONAL_SPECIALTIES,
+} from "../utils/professionalForm";
 
 type props = NativeStackScreenProps<AppstackParamList, "Professional">;
 
 export function ProfessionalScreen({ navigation }: props) {
   const [nombres, setNombres] = useState("");
   const [apellidos, setApellidos] = useState("");
+  const [tipoDocumento, setTipoDocumento] = useState("");
   const [numeroDocumento, setNumeroDocumento] = useState("");
   const [telefono, setTelefono] = useState("");
   const [correoElectronico, setCorreoElectronico] = useState("");
   const [especialidad, setEspecialidad] = useState("");
   const [licenciaMedica, setLicenciaMedica] = useState("");
   const [institucion, setInstitucion] = useState("");
-  const [estadoUsuario, setEstadoUsuario] = useState("Activo");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
-  const goToHistory = () => {
-    navigation.navigate("History");
+  const handleSubmit = async () => {
+    const registration = prepareProfessionalRegistration({
+      nombres,
+      apellidos,
+      tipoDocumento,
+      numeroDocumento,
+      telefono,
+      correoElectronico,
+      especialidad,
+      licenciaMedica,
+      institucion,
+      password,
+      confirmPassword,
+    });
+
+    if (!registration.success) {
+      setErrorMessage(registration.error);
+      setSuccessMessage("");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setErrorMessage("");
+    setSuccessMessage("");
+
+    try {
+      const createdProfessional = await createProfessional(registration.data);
+      setSuccessMessage(
+        `Profesional ${createdProfessional.firstName} ${createdProfessional.lastName} registrado correctamente.`,
+      );
+      setPassword("");
+      setConfirmPassword("");
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : "Ocurrió un error inesperado al registrar al profesional.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
-
-  //const handleSubmit = () => {
-  //  onSubmit?.({
-  //    nombres,
-  //    apellidos,
-  //    numeroDocumento,
-  //    telefono,
-  //    correoElectronico,
-  //    especialidad,
-  //    licenciaMedica,
-  //    institucion,
-  //    estadoUsuario,
-  //    password,
-  //    confirmPassword,
-  //  });
-  //};
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
@@ -79,6 +97,17 @@ export function ProfessionalScreen({ navigation }: props) {
           <Text style={styles.subtitle}>
             Complete el formulario para registrar un profesional médico
           </Text>
+
+          {errorMessage ? (
+            <Text accessibilityRole="alert" style={styles.errorMessage}>
+              {errorMessage}
+            </Text>
+          ) : null}
+          {successMessage ? (
+            <Text accessibilityRole="alert" style={styles.successMessage}>
+              {successMessage}
+            </Text>
+          ) : null}
 
           {/* Tarjeta: Información Personal */}
           <View style={styles.card}>
@@ -103,6 +132,15 @@ export function ProfessionalScreen({ navigation }: props) {
               value={apellidos}
               onChangeText={setApellidos}
               placeholder="González Torres"
+            />
+
+            <SelectField
+              label="Tipo Documento"
+              required
+              value={tipoDocumento}
+              placeholder="Seleccione..."
+              options={PROFESSIONAL_DOCUMENT_TYPES}
+              onSelect={setTipoDocumento}
             />
 
             <TextField
@@ -154,7 +192,7 @@ export function ProfessionalScreen({ navigation }: props) {
               required
               value={especialidad}
               placeholder="Seleccione..."
-              options={SPECIALTIES}
+              options={PROFESSIONAL_SPECIALTIES}
               onSelect={setEspecialidad}
             />
 
@@ -169,18 +207,12 @@ export function ProfessionalScreen({ navigation }: props) {
 
             <TextField
               label="Institución / Hospital"
+              required
               value={institucion}
               onChangeText={setInstitucion}
               placeholder="Hospital Nacional Dos de Mayo"
             />
 
-            <SelectField
-              label="Estado del Usuario"
-              value={estadoUsuario}
-              placeholder="Seleccione..."
-              options={USER_STATUSES}
-              onSelect={setEstadoUsuario}
-            />
           </View>
 
           {/* Tarjeta: Configuración de Acceso */}
@@ -216,24 +248,30 @@ export function ProfessionalScreen({ navigation }: props) {
           {/* Botones */}
           <TouchableOpacity
             style={styles.submitButton}
-            onPress={() => {}}
+            onPress={handleSubmit}
+            disabled={isSubmitting}
             activeOpacity={0.85}
           >
-            <Text style={styles.submitButtonText}>Registrar Profesional</Text>
+            {isSubmitting ? (
+              <ActivityIndicator color="#FFFFFF" />
+            ) : (
+              <Text style={styles.submitButtonText}>
+                Registrar Profesional
+              </Text>
+            )}
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.cancelButton}
-            onPress={() => {}}
+            onPress={() => navigation.goBack()}
             activeOpacity={0.7}
           >
             <Text style={styles.cancelButtonText}>Cancelar</Text>
           </TouchableOpacity>
 
-          {/* BORRAR DESPUES */}
           <TouchableOpacity
             style={styles.submitButton}
-            onPress={goToHistory}
+            onPress={() => navigation.navigate("History")}
             activeOpacity={0.7}
           >
             <Text style={styles.cancelButtonText}>Crear historial</Text>

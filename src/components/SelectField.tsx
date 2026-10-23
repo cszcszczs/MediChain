@@ -3,8 +3,23 @@ import { View, Text, TouchableOpacity, Modal, FlatList } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { styles } from '../styles/SelectFieldStyle';
 
+interface SelectFieldProps {
+  label?: string;
+  required?: boolean;
+  value: string;
+  placeholder?: string;
+  options: string[];
+  onSelect: (value: string) => void;
+}
 
-export function SelectField({ label, required, value, placeholder, options, onSelect }) {
+export function SelectField({
+  label,
+  required,
+  value,
+  placeholder,
+  options,
+  onSelect,
+}: SelectFieldProps) {
   const [open, setOpen] = useState(false);
   const [focused, setFocused] = useState(false);
 
