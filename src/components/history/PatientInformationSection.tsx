@@ -1,7 +1,7 @@
 import { Text, View } from "react-native";
 import { Feather } from "@expo/vector-icons";
+import { DateField } from "../DateField";
 import { SelectField } from "../SelectField";
-import { TextField } from "../TextField";
 import { PatientResponseDTO } from "../../services/patients";
 import { styles } from "../../styles/HistoryStyle";
 
@@ -43,13 +43,11 @@ export function PatientInformationSection({
         }))}
         onSelect={onPatientChange}
       />
-      <TextField
+      <DateField
         label="Fecha de Consulta"
         required
         value={consultationDate}
-        onChangeText={onConsultationDateChange}
-        placeholder="AAAA-MM-DD"
-        icon="calendar"
+        onChange={onConsultationDateChange}
       />
     </View>
   );

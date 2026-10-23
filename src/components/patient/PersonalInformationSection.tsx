@@ -1,5 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 import { Text, View } from "react-native";
+import { DateField } from "../DateField";
 import { SelectField } from "../SelectField";
 import { TextField } from "../TextField";
 import { styles } from "../../styles/PatientStyle";
@@ -58,13 +59,12 @@ export function PersonalInformationSection({
         icon="credit-card"
         keyboardType="numeric"
       />
-      <TextField
+      <DateField
         label="Fecha de Nacimiento"
         required
         value={values.fechaNacimiento}
-        onChangeText={(value) => onChange("fechaNacimiento", value)}
-        placeholder="AAAA-MM-DD"
-        icon="calendar"
+        onChange={(value) => onChange("fechaNacimiento", value)}
+        maximumDate={new Date()}
       />
       <SelectField
         label="Género"

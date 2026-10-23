@@ -11,8 +11,8 @@ import {
   View,
 } from "react-native";
 import { CheckboxRow } from "../CheckboxRow";
+import { DateField } from "../DateField";
 import { SelectField } from "../SelectField";
-import { TextField } from "../TextField";
 import { PatientResponseDTO } from "../../services/patients";
 import { ProfessionalResponseDTO } from "../../services/professionals";
 import {
@@ -58,6 +58,12 @@ export function AuthorizeAccessModal({
   const [selectedPatient, setSelectedPatient] = useState("");
   const [checkedPermissions, setCheckedPermissions] =
     useState(EMPTY_PERMISSIONS);
+  const [minimumExpirationDate] = useState(() => {
+    const tomorrow = new Date();
+    tomorrow.setHours(0, 0, 0, 0);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return tomorrow;
+  });
   const [expirationDate, setExpirationDate] = useState("");
   const [formError, setFormError] = useState("");
 
@@ -169,12 +175,11 @@ export function AuthorizeAccessModal({
                 onToggle={() => togglePermission(permission.key)}
               />
             ))}
-            <TextField
+            <DateField
               label="Fecha de Expiración (Opcional)"
               value={expirationDate}
-              onChangeText={setExpirationDate}
-              placeholder="AAAA-MM-DD"
-              icon="calendar"
+              onChange={setExpirationDate}
+              minimumDate={minimumExpirationDate}
             />
           </ScrollView>
 
