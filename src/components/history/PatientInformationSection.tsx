@@ -1,0 +1,54 @@
+import { Text, View } from "react-native";
+import { Feather } from "@expo/vector-icons";
+import { DateField } from "../DateField";
+import { SelectField } from "../SelectField";
+import { PatientResponseDTO } from "../../services/patients";
+import { styles } from "../../styles/HistoryStyle";
+
+interface PatientInformationSectionProps {
+  patients: PatientResponseDTO[];
+  selectedPatientId: string;
+  consultationDate: string;
+  isLoadingPatients: boolean;
+  onPatientChange: (id: string) => void;
+  onConsultationDateChange: (date: string) => void;
+}
+
+export function PatientInformationSection({
+  patients,
+  selectedPatientId,
+  consultationDate,
+  isLoadingPatients,
+  onPatientChange,
+  onConsultationDateChange,
+}: PatientInformationSectionProps) {
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHeader}>
+        <View style={styles.cardIconWrapper}>
+          <Feather name="user" size={16} color="#2563EB" />
+        </View>
+        <Text style={styles.cardTitle}>Información del Paciente</Text>
+      </View>
+      <SelectField
+        label="Paciente"
+        required
+        value={selectedPatientId}
+        placeholder={
+          isLoadingPatients ? "Cargando pacientes..." : "Seleccione un paciente..."
+        }
+        options={patients.map((patient) => ({
+          label: patient.name,
+          value: patient.id,
+        }))}
+        onSelect={onPatientChange}
+      />
+      <DateField
+        label="Fecha de Consulta"
+        required
+        value={consultationDate}
+        onChange={onConsultationDateChange}
+      />
+    </View>
+  );
+}

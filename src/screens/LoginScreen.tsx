@@ -1,4 +1,4 @@
-import  { useState } from 'react';
+import { useState } from 'react';
 import {
   View,
   Text,
@@ -7,12 +7,14 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { styles } from '../styles/LoginStyle';
 import { Feather } from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AppstackParamList } from '../types/navigation';
+import { useAuth } from '../hooks/useAuth';
 
 type props = NativeStackScreenProps<AppstackParamList, 'Login'>
 
@@ -21,9 +23,26 @@ export function LoginScreen({navigation}: props) {
   const [password, setPassword] = useState('');
   const [emailFocused, setEmailFocused] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const { signIn } = useAuth();
 
-  const goToPatient = () => {
-    navigation.navigate('Patient');
+  const handleLogin = async () => {
+    setIsSubmitting(true);
+    setErrorMessage('');
+
+    try {
+      await signIn({ email: email.trim(), password });
+      navigation.navigate('Patient');
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : 'Ocurrió un error inesperado al iniciar sesión.',
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -41,6 +60,12 @@ export function LoginScreen({navigation}: props) {
             <Text style={styles.subtitle}>
               Ingrese sus credenciales para acceder al sistema
             </Text>
+
+            {errorMessage ? (
+              <Text accessibilityRole="alert" style={styles.errorMessage}>
+                {errorMessage}
+              </Text>
+            ) : null}
 
             {/* Correo electrónico */}
             <Text style={styles.label}>Correo Electrónico</Text>
@@ -79,10 +104,15 @@ export function LoginScreen({navigation}: props) {
             {/* Botón */}
             <TouchableOpacity
               style={styles.button}
-              onPress={goToPatient}
+              onPress={handleLogin}
+              disabled={isSubmitting}
               activeOpacity={0.85}
             >
-              <Text style={styles.buttonText}>Iniciar Sesión</Text>
+              {isSubmitting ? (
+                <ActivityIndicator color="#FFFFFF" />
+              ) : (
+                <Text style={styles.buttonText}>Iniciar Sesión</Text>
+              )}
             </TouchableOpacity>
           </View>
         </ScrollView>

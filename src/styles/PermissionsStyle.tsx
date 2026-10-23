@@ -39,6 +39,18 @@ export const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
   },
+  errorMessage: {
+    color: '#B91C1C',
+    fontSize: 13,
+    lineHeight: 18,
+    marginBottom: 8,
+  },
+  retryLink: {
+    color: '#2563EB',
+    fontSize: 13,
+    fontWeight: '600',
+    marginBottom: 12,
+  },
 
   // Buscador + filtro
   filterCard: {
@@ -151,6 +163,20 @@ export const styles = StyleSheet.create({
   },
   revokeButtonText: {
     color: '#DC2626',
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  acceptButton: {
+    borderWidth: 1.5,
+    borderColor: '#86EFAC',
+    backgroundColor: '#F0FDF4',
+    borderRadius: 10,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  acceptButtonText: {
+    color: '#15803D',
     fontSize: 14,
     fontWeight: '700',
   },

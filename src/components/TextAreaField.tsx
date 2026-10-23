@@ -1,6 +1,15 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet } from 'react-native';
+import { View, Text, TextInput } from 'react-native';
 import { styles } from '../styles/TextAreaFieldStyle';
+
+interface TextAreaFieldProps {
+  label?: string;
+  required?: boolean;
+  value: string;
+  onChangeText: (value: string) => void;
+  placeholder?: string;
+  minHeight?: number;
+}
 
 // Textarea reutilizable con label, asterisco de requerido y borde azul al enfocar.
 export function TextAreaField({
@@ -10,7 +19,7 @@ export function TextAreaField({
   onChangeText,
   placeholder,
   minHeight = 90,
-}) {
+}: TextAreaFieldProps) {
   const [focused, setFocused] = useState(false);
 
   return (

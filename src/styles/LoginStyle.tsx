@@ -38,6 +38,12 @@ export const styles = StyleSheet.create({
     marginBottom: 20,
     lineHeight: 18,
   },
+  errorMessage: {
+    color: '#B91C1C',
+    fontSize: 13,
+    lineHeight: 18,
+    marginBottom: 8,
+  },
   label: {
     fontSize: 13,
     fontWeight: '600',

@@ -21,6 +21,18 @@ export const styles = StyleSheet.create({
     color: colors.textLight,
     marginBottom: 18,
   },
+  errorMessage: {
+    color: '#B91C1C',
+    fontSize: 13,
+    lineHeight: 18,
+    marginBottom: 12,
+  },
+  successMessage: {
+    color: '#15803D',
+    fontSize: 13,
+    lineHeight: 18,
+    marginBottom: 12,
+  },
   card: {
     backgroundColor: colors.white,
     borderRadius: 16,
