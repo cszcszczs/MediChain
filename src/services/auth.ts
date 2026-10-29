@@ -11,6 +11,7 @@ export interface LoginResponseDTO {
   user: {
     id: string;
     email: string;
+    name: string;
   };
 }
 
@@ -28,7 +29,9 @@ function parseLoginResponse(payload: unknown): LoginResponseDTO {
     !("id" in payload.user) ||
     typeof payload.user.id !== "string" ||
     !("email" in payload.user) ||
-    typeof payload.user.email !== "string"
+    typeof payload.user.email !== "string" ||
+    !("name" in payload.user) ||
+    typeof payload.user.name !== "string"
   ) {
     throw new Error("El backend devolvió una respuesta de inicio de sesión inválida.");
   }
@@ -39,6 +42,7 @@ function parseLoginResponse(payload: unknown): LoginResponseDTO {
     user: {
       id: payload.user.id,
       email: payload.user.email,
+      name: payload.user.name,
     },
   };
 }

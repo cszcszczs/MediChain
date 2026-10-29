@@ -1,8 +1,12 @@
 
 import { Feather } from "@expo/vector-icons";
 import { NavigationContainer } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { Alert, Text, TouchableOpacity } from "react-native";
+import { useState } from "react";
+import { useAuth } from "../hooks/useAuth";
 import { HistoryScreen } from "../screens/HistoryScreen";
 import { LoginScreen } from "../screens/LoginScreen";
 import { PatientScreen } from "../screens/PatientScreen";
@@ -26,6 +30,50 @@ const tabLabels = {
   History: "Historial",
   Permissions: "Permisos",
 } as const;
+
+function LogoutButton({
+  navigation,
+}: {
+  navigation: NativeStackNavigationProp<AppstackParamList>;
+}) {
+  const { signOut } = useAuth();
+  const [isSigningOut, setIsSigningOut] = useState(false);
+
+  const handleSignOut = async () => {
+    if (isSigningOut) {
+      return;
+    }
+
+    setIsSigningOut(true);
+    try {
+      await signOut();
+      navigation.reset({ index: 0, routes: [{ name: "Login" }] });
+    } catch (error) {
+      Alert.alert(
+        "No se pudo cerrar sesión",
+        error instanceof Error ? error.message : "Inténtalo de nuevo.",
+      );
+    } finally {
+      setIsSigningOut(false);
+    }
+  };
+
+  return (
+    <TouchableOpacity
+      accessibilityRole="button"
+      accessibilityLabel="Cerrar sesión"
+      disabled={isSigningOut}
+      onPress={() => void handleSignOut()}
+      hitSlop={10}
+    >
+      <Feather
+        name="log-out"
+        size={21}
+        color={isSigningOut ? "#FCA5A5" : "#DC2626"}
+      />
+    </TouchableOpacity>
+  );
+}
 
 function MainTabs() {
   return (
@@ -67,9 +115,30 @@ export function AppNavigator() {
         <Stack.Screen
           name="Main"
           component={MainTabs}
-          options={{ headerShown: false }}
+          options={({ navigation }) => ({
+            headerShown: true,
+            headerTitle: "",
+            headerShadowVisible: false,
+            headerStyle: { backgroundColor: "#FFFFFF" },
+            headerLeft: () => <LogoutButton navigation={navigation} />,
+            headerRight: () => <UserHeaderName />,
+          })}
         />
       </Stack.Navigator>
     </NavigationContainer>
+  );
+}
+
+function UserHeaderName() {
+  const { user } = useAuth();
+
+  return (
+    <Text
+      numberOfLines={1}
+      ellipsizeMode="tail"
+      style={{ maxWidth: 220, color: "#111827", fontSize: 14, fontWeight: "600" }}
+    >
+      {user?.name ?? user?.email ?? ""}
+    </Text>
   );
 }
