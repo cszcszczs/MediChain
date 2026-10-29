@@ -1,5 +1,4 @@
 import { Feather } from "@expo/vector-icons";
-import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -19,12 +18,9 @@ import { PatientInformationSection } from "../components/history/PatientInformat
 import { TreatmentSection } from "../components/history/TreatmentSection";
 import { VitalSignsSection } from "../components/history/VitalSignsSection";
 import { useHistoryForm } from "../hooks/useHistoryForm";
-import type { AppstackParamList } from "../types/navigation";
 import { styles } from "../styles/HistoryStyle";
 
-type Props = NativeStackScreenProps<AppstackParamList, "History">;
-
-export function HistoryScreen({ navigation }: Props) {
+export function HistoryScreen() {
   const form = useHistoryForm();
 
   return (
@@ -135,21 +131,6 @@ export function HistoryScreen({ navigation }: Props) {
             )}
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.cancelButton}
-            onPress={() => navigation.goBack()}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.cancelButtonText}>Cancelar</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.submitButton}
-            onPress={() => navigation.navigate("Permissions")}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.cancelButtonText}>Gestionar Permisos</Text>
-          </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

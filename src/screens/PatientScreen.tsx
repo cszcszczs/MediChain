@@ -1,16 +1,12 @@
 import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, Text, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AccessCredentialsSection } from "../components/patient/AccessCredentialsSection";
 import { ContactInformationSection } from "../components/patient/ContactInformationSection";
 import { PersonalInformationSection } from "../components/patient/PersonalInformationSection";
 import { usePatientRegistration } from "../hooks/usePatientRegistration";
-import { AppstackParamList } from "../types/navigation";
 import { styles } from "../styles/PatientStyle";
 
-type PatientScreenProps = NativeStackScreenProps<AppstackParamList, "Patient">;
-
-export function PatientScreen({ navigation }: PatientScreenProps) {
+export function PatientScreen() {
   const {
     values,
     updateField,
@@ -66,21 +62,6 @@ export function PatientScreen({ navigation }: PatientScreenProps) {
             )}
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.cancelButton}
-            onPress={() => navigation.goBack()}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.cancelButtonText}>Cancelar</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.submitButton}
-            onPress={() => navigation.navigate("Professional")}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.cancelButtonText}>Registrar Médico</Text>
-          </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

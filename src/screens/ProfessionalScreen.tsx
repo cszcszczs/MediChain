@@ -7,20 +7,13 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AccessCredentialsSection } from "../components/professional/AccessCredentialsSection";
 import { PersonalInformationSection } from "../components/professional/PersonalInformationSection";
 import { ProfessionalInformationSection } from "../components/professional/ProfessionalInformationSection";
 import { useProfessionalRegistration } from "../hooks/useProfessionalRegistration";
-import { AppstackParamList } from "../types/navigation";
 import { styles } from "../styles/PatientStyle";
 
-type ProfessionalScreenProps = NativeStackScreenProps<
-  AppstackParamList,
-  "Professional"
->;
-
-export function ProfessionalScreen({ navigation }: ProfessionalScreenProps) {
+export function ProfessionalScreen() {
   const {
     values,
     updateField,
@@ -29,10 +22,6 @@ export function ProfessionalScreen({ navigation }: ProfessionalScreenProps) {
     successMessage,
     submit,
   } = useProfessionalRegistration();
-
-  const openHistory = () => {
-    navigation.navigate("History");
-  };
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
@@ -85,21 +74,6 @@ export function ProfessionalScreen({ navigation }: ProfessionalScreenProps) {
             )}
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.cancelButton}
-            onPress={() => navigation.goBack()}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.cancelButtonText}>Cancelar</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.submitButton}
-            onPress={openHistory}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.cancelButtonText}>Crear historial</Text>
-          </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
