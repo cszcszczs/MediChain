@@ -43,7 +43,7 @@ export function AccessGrantCard({
           <View style={styles.avatar}>
             <Feather name="user" size={18} color="#2563EB" />
           </View>
-          <View>
+          <View style={styles.professionalInfoDetails}>
             <Text style={styles.professionalName}>
               {grant.professional.name}
             </Text>
