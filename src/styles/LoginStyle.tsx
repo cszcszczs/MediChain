@@ -62,7 +62,7 @@ export const styles = StyleSheet.create({
     backgroundColor: '#FAFAFA',
   },
   inputWrapperFocused: {
-    borderColor: colors.border,
+    borderColor: colors.primary,
     borderWidth: 1.5,
     backgroundColor: '#FFFFFF',
   },

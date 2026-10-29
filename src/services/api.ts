@@ -2,9 +2,17 @@ import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
 
 const ACCESS_TOKEN_KEY = "medichain.accessToken";
+const USER_PROFILE_KEY = "medichain.userProfile";
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL?.replace(/\/+$/, "");
 
 let webAccessToken: string | null = null;
+let webUserProfile: StoredUserProfile | null = null;
+
+export interface StoredUserProfile {
+  id: string;
+  email: string;
+  name: string;
+}
 
 export class ApiError extends Error {
   constructor(
@@ -45,6 +53,71 @@ export async function clearAccessToken(): Promise<void> {
   }
 
   await SecureStore.deleteItemAsync(ACCESS_TOKEN_KEY);
+}
+
+export async function saveUserProfile(
+  profile: StoredUserProfile,
+): Promise<void> {
+  if (Platform.OS === "web") {
+    webUserProfile = profile;
+    return;
+  }
+
+  await SecureStore.setItemAsync(USER_PROFILE_KEY, JSON.stringify(profile));
+}
+
+export async function getUserProfile(): Promise<StoredUserProfile | null> {
+  const value =
+    Platform.OS === "web"
+      ? webUserProfile
+      : await SecureStore.getItemAsync(USER_PROFILE_KEY);
+
+  if (value === null) {
+    return null;
+  }
+
+  if (typeof value !== "string") {
+    return value;
+  }
+
+  let profile: unknown;
+  try {
+    profile = JSON.parse(value);
+  } catch (error) {
+    if (error instanceof SyntaxError) {
+      throw new ApiError("El perfil guardado localmente no es válido.");
+    }
+
+    throw error;
+  }
+
+  if (
+    typeof profile !== "object" ||
+    profile === null ||
+    !("id" in profile) ||
+    typeof profile.id !== "string" ||
+    !("email" in profile) ||
+    typeof profile.email !== "string" ||
+    !("name" in profile) ||
+    typeof profile.name !== "string"
+  ) {
+    throw new ApiError("El perfil guardado localmente no es válido.");
+  }
+
+  return {
+    id: profile.id,
+    email: profile.email,
+    name: profile.name,
+  };
+}
+
+export async function clearUserProfile(): Promise<void> {
+  if (Platform.OS === "web") {
+    webUserProfile = null;
+    return;
+  }
+
+  await SecureStore.deleteItemAsync(USER_PROFILE_KEY);
 }
 
 function parseJson(text: string, status: number): unknown {

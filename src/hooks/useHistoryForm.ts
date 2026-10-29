@@ -22,8 +22,13 @@ let nextId = 1;
 const generateId = () => nextId++;
 
 export function useHistoryForm() {
-  const { patients, isLoading: isLoadingPatients, error: patientError, refresh } =
-    usePatients();
+  const {
+    patients,
+    isLoading: isLoadingPatients,
+    error: patientError,
+    refresh,
+    clearError: clearPatientError,
+  } = usePatients();
   const [patientId, setPatientId] = useState("");
   const [consultationDate, setConsultationDate] = useState(
     new Date().toISOString().slice(0, 10),
@@ -140,6 +145,11 @@ export function useHistoryForm() {
     setAttachments((current) => current.filter((file) => file.uri !== uri));
   }, []);
 
+  const clearFeedback = useCallback(() => {
+    setErrorMessage("");
+    setSuccessMessage("");
+  }, []);
+
   const submit = useCallback(async () => {
     const form = prepareHistory(
       {
@@ -202,6 +212,7 @@ export function useHistoryForm() {
     isLoadingPatients,
     patientError,
     refreshPatients: refresh,
+    clearPatientError,
     patientId,
     setPatientId,
     consultationDate,
@@ -236,6 +247,7 @@ export function useHistoryForm() {
     isSubmitting,
     errorMessage,
     successMessage,
+    clearFeedback,
     submit,
   };
 }

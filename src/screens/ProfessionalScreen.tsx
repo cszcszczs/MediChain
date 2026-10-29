@@ -7,20 +7,14 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AccessCredentialsSection } from "../components/professional/AccessCredentialsSection";
 import { PersonalInformationSection } from "../components/professional/PersonalInformationSection";
 import { ProfessionalInformationSection } from "../components/professional/ProfessionalInformationSection";
+import { RegistrationFeedbackModal } from "../components/RegistrationFeedbackModal";
 import { useProfessionalRegistration } from "../hooks/useProfessionalRegistration";
-import { AppstackParamList } from "../types/navigation";
 import { styles } from "../styles/PatientStyle";
 
-type ProfessionalScreenProps = NativeStackScreenProps<
-  AppstackParamList,
-  "Professional"
->;
-
-export function ProfessionalScreen({ navigation }: ProfessionalScreenProps) {
+export function ProfessionalScreen() {
   const {
     values,
     updateField,
@@ -28,11 +22,8 @@ export function ProfessionalScreen({ navigation }: ProfessionalScreenProps) {
     errorMessage,
     successMessage,
     submit,
+    clearFeedback,
   } = useProfessionalRegistration();
-
-  const openHistory = () => {
-    navigation.navigate("History");
-  };
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
@@ -48,17 +39,6 @@ export function ProfessionalScreen({ navigation }: ProfessionalScreenProps) {
           <Text style={styles.subtitle}>
             Complete el formulario para registrar un profesional médico
           </Text>
-
-          {errorMessage ? (
-            <Text accessibilityRole="alert" style={styles.errorMessage}>
-              {errorMessage}
-            </Text>
-          ) : null}
-          {successMessage ? (
-            <Text accessibilityRole="alert" style={styles.successMessage}>
-              {successMessage}
-            </Text>
-          ) : null}
 
           <PersonalInformationSection
             values={values}
@@ -85,23 +65,13 @@ export function ProfessionalScreen({ navigation }: ProfessionalScreenProps) {
             )}
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.cancelButton}
-            onPress={() => navigation.goBack()}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.cancelButtonText}>Cancelar</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.submitButton}
-            onPress={openHistory}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.cancelButtonText}>Crear historial</Text>
-          </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
+      <RegistrationFeedbackModal
+        type={errorMessage ? "error" : "success"}
+        message={errorMessage || successMessage}
+        onClose={clearFeedback}
+      />
     </SafeAreaView>
   );
 }

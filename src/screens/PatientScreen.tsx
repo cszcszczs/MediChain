@@ -1,16 +1,20 @@
-import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, Text, TouchableOpacity } from "react-native";
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AccessCredentialsSection } from "../components/patient/AccessCredentialsSection";
 import { ContactInformationSection } from "../components/patient/ContactInformationSection";
 import { PersonalInformationSection } from "../components/patient/PersonalInformationSection";
+import { RegistrationFeedbackModal } from "../components/RegistrationFeedbackModal";
 import { usePatientRegistration } from "../hooks/usePatientRegistration";
-import { AppstackParamList } from "../types/navigation";
 import { styles } from "../styles/PatientStyle";
 
-type PatientScreenProps = NativeStackScreenProps<AppstackParamList, "Patient">;
-
-export function PatientScreen({ navigation }: PatientScreenProps) {
+export function PatientScreen() {
   const {
     values,
     updateField,
@@ -18,6 +22,7 @@ export function PatientScreen({ navigation }: PatientScreenProps) {
     errorMessage,
     successMessage,
     submit,
+    clearFeedback,
   } = usePatientRegistration();
 
   return (
@@ -34,17 +39,6 @@ export function PatientScreen({ navigation }: PatientScreenProps) {
           <Text style={styles.subtitle}>
             Complete el formulario para registrar un nuevo paciente
           </Text>
-
-          {errorMessage ? (
-            <Text accessibilityRole="alert" style={styles.errorMessage}>
-              {errorMessage}
-            </Text>
-          ) : null}
-          {successMessage ? (
-            <Text accessibilityRole="alert" style={styles.successMessage}>
-              {successMessage}
-            </Text>
-          ) : null}
 
           <PersonalInformationSection
             values={values}
@@ -65,24 +59,13 @@ export function PatientScreen({ navigation }: PatientScreenProps) {
               <Text style={styles.submitButtonText}>Registrar Paciente</Text>
             )}
           </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.cancelButton}
-            onPress={() => navigation.goBack()}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.cancelButtonText}>Cancelar</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.submitButton}
-            onPress={() => navigation.navigate("Professional")}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.cancelButtonText}>Registrar Médico</Text>
-          </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
+      <RegistrationFeedbackModal
+        type={errorMessage ? "error" : "success"}
+        message={errorMessage || successMessage}
+        onClose={clearFeedback}
+      />
     </SafeAreaView>
   );
 }

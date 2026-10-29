@@ -34,6 +34,11 @@ export function useProfessionalRegistration() {
     [],
   );
 
+  const clearFeedback = useCallback(() => {
+    setErrorMessage("");
+    setSuccessMessage("");
+  }, []);
+
   const submit = useCallback(async () => {
     const registration = prepareProfessionalRegistration(values);
     if (!registration.success) {
@@ -74,5 +79,6 @@ export function useProfessionalRegistration() {
     errorMessage,
     successMessage,
     submit,
+    clearFeedback,
   };
 }

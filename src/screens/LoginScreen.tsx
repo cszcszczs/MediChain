@@ -33,7 +33,7 @@ export function LoginScreen({navigation}: props) {
 
     try {
       await signIn({ email: email.trim(), password });
-      navigation.navigate('Patient');
+      navigation.replace("Main");
     } catch (error) {
       setErrorMessage(
         error instanceof Error

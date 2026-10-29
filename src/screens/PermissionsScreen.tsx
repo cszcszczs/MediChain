@@ -11,6 +11,7 @@ import { AccessGrantFilters } from "../components/permissions/AccessGrantFilters
 import { AccessGrantList } from "../components/permissions/AccessGrantList";
 import { AuthorizeAccessModal } from "../components/permissions/AuthorizeAccessModal";
 import { useAccessGrants } from "../hooks/useAccessGrants";
+import { useAuth } from "../hooks/useAuth";
 import { usePatients } from "../hooks/usePatients";
 import { useProfessionals } from "../hooks/useProfessionals";
 import { styles } from "../styles/PermissionsStyle";
@@ -19,6 +20,7 @@ import { formatAccessGrantStatus } from "../utils/accessGrantForm";
 const ALL_STATUSES = "";
 
 export function PermissionsScreen() {
+  const { user } = useAuth();
   const {
     grants,
     isLoading: isLoadingGrants,
@@ -71,6 +73,13 @@ export function PermissionsScreen() {
   }, [grants, searchQuery, statusFilter]);
 
   const isLoadingOptions = isLoadingPatients || isLoadingProfessionals;
+  const userEmail = user?.email.trim().toLocaleLowerCase();
+  const canAcceptGrants = Boolean(
+    userEmail &&
+      patients.some(
+        (patient) => patient.email.trim().toLocaleLowerCase() === userEmail,
+      ),
+  );
   const dataErrors = [
     ...(patientsError
       ? [{ message: patientsError, retry: refreshPatients }]
@@ -125,6 +134,7 @@ export function PermissionsScreen() {
           grants={filteredGrants}
           isLoading={isLoadingGrants}
           isUpdating={isUpdating}
+          canAccept={canAcceptGrants}
           hasActiveFilters={Boolean(searchQuery.trim() || statusFilter)}
           onAccept={(id) => void accept(id)}
           onRevoke={(id) => void revoke(id)}

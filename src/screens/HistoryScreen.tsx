@@ -1,5 +1,4 @@
 import { Feather } from "@expo/vector-icons";
-import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -10,6 +9,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { RegistrationFeedbackModal } from "../components/RegistrationFeedbackModal";
 import { AdditionalNotesSection } from "../components/history/AdditionalNotesSection";
 import { AttachmentsSection } from "../components/history/AttachmentsSection";
 import { DiagnosisSection } from "../components/history/DiagnosisSection";
@@ -19,12 +19,9 @@ import { PatientInformationSection } from "../components/history/PatientInformat
 import { TreatmentSection } from "../components/history/TreatmentSection";
 import { VitalSignsSection } from "../components/history/VitalSignsSection";
 import { useHistoryForm } from "../hooks/useHistoryForm";
-import type { AppstackParamList } from "../types/navigation";
 import { styles } from "../styles/HistoryStyle";
 
-type Props = NativeStackScreenProps<AppstackParamList, "History">;
-
-export function HistoryScreen({ navigation }: Props) {
+export function HistoryScreen() {
   const form = useHistoryForm();
 
   return (
@@ -44,23 +41,10 @@ export function HistoryScreen({ navigation }: Props) {
 
           {form.patientError ? (
             <View>
-              <Text accessibilityRole="alert" style={styles.errorMessage}>
-                {form.patientError}
-              </Text>
               <TouchableOpacity onPress={() => void form.refreshPatients()}>
                 <Text style={styles.addLink}>Reintentar carga de pacientes</Text>
               </TouchableOpacity>
             </View>
-          ) : null}
-          {form.errorMessage ? (
-            <Text accessibilityRole="alert" style={styles.errorMessage}>
-              {form.errorMessage}
-            </Text>
-          ) : null}
-          {form.successMessage ? (
-            <Text accessibilityRole="alert" style={styles.successMessage}>
-              {form.successMessage}
-            </Text>
           ) : null}
 
           <PatientInformationSection
@@ -135,23 +119,25 @@ export function HistoryScreen({ navigation }: Props) {
             )}
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.cancelButton}
-            onPress={() => navigation.goBack()}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.cancelButtonText}>Cancelar</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.submitButton}
-            onPress={() => navigation.navigate("Permissions")}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.cancelButtonText}>Gestionar Permisos</Text>
-          </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
+      <RegistrationFeedbackModal
+        type={
+          form.errorMessage || form.patientError ? "error" : "success"
+        }
+        title={
+          form.patientError
+            ? "No se pudieron cargar pacientes"
+            : form.errorMessage
+              ? "No se pudo guardar"
+              : "Historial guardado"
+        }
+        message={form.errorMessage || form.patientError || form.successMessage}
+        onClose={() => {
+          form.clearFeedback();
+          form.clearPatientError();
+        }}
+      />
     </SafeAreaView>
   );
 }

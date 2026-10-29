@@ -15,6 +15,7 @@ import { styles } from "../../styles/PermissionsStyle";
 interface AccessGrantCardProps {
   grant: AccessGrantResponseDTO;
   isUpdating: boolean;
+  canAccept: boolean;
   onAccept: (id: string) => void;
   onRevoke: (id: string) => void;
 }
@@ -33,9 +34,13 @@ function formatDate(date: string): string {
 export function AccessGrantCard({
   grant,
   isUpdating,
+  canAccept,
   onAccept,
   onRevoke,
 }: AccessGrantCardProps) {
+  const canShowActions =
+    grant.status === "ACTIVE" || (grant.status === "PENDING" && canAccept);
+
   return (
     <View style={styles.card}>
       <View style={styles.cardTopRow}>
@@ -43,7 +48,7 @@ export function AccessGrantCard({
           <View style={styles.avatar}>
             <Feather name="user" size={18} color="#2563EB" />
           </View>
-          <View>
+          <View style={styles.professionalInfoDetails}>
             <Text style={styles.professionalName}>
               {grant.professional.name}
             </Text>
@@ -81,10 +86,10 @@ export function AccessGrantCard({
         </View>
       </View>
 
-      {(grant.status === "PENDING" || grant.status === "ACTIVE") && (
+      {canShowActions && (
         <>
           <View style={styles.divider} />
-          {grant.status === "PENDING" ? (
+          {grant.status === "PENDING" && canAccept ? (
             <TouchableOpacity
               style={styles.acceptButton}
               activeOpacity={0.7}

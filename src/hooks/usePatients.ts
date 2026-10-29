@@ -24,6 +24,10 @@ export function usePatients() {
     }
   }, []);
 
+  const clearError = useCallback(() => {
+    setError("");
+  }, []);
+
   useEffect(() => {
     let isMounted = true;
 
@@ -53,5 +57,5 @@ export function usePatients() {
     };
   }, []);
 
-  return { patients, isLoading, error, refresh };
+  return { patients, isLoading, error, refresh, clearError };
 }

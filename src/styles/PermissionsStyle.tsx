@@ -106,7 +106,13 @@ export const styles = StyleSheet.create({
   professionalInfoRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    flexShrink: 1,
+    flex: 1,
+    minWidth: 0,
+    marginRight: 8,
+  },
+  professionalInfoDetails: {
+    flex: 1,
+    minWidth: 0,
   },
   avatar: {
     width: 38,
@@ -121,6 +127,7 @@ export const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '700',
     color: '#111827',
+    flexShrink: 1,
   },
   professionalSpecialty: {
     fontSize: 12,

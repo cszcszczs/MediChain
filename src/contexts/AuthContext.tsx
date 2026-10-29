@@ -6,7 +6,13 @@ import {
   useMemo,
   useState,
 } from "react";
-import { clearAccessToken, getAccessToken } from "../services/api";
+import {
+  clearAccessToken,
+  clearUserProfile,
+  getAccessToken,
+  getUserProfile,
+  saveUserProfile,
+} from "../services/api";
 import { login, LoginRequestDTO, LoginResponseDTO } from "../services/auth";
 
 interface AuthContextValue {
@@ -28,9 +34,14 @@ export function AuthProvider({ children }: PropsWithChildren) {
     let isMounted = true;
 
     getAccessToken()
-      .then((token) => {
-        if (isMounted) {
-          setIsAuthenticated(Boolean(token));
+      .then(async (token) => {
+        if (!isMounted) {
+          return;
+        }
+
+        setIsAuthenticated(Boolean(token));
+        if (token) {
+          setUser(await getUserProfile());
         }
       })
       .catch((error: unknown) => {
@@ -49,12 +60,14 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
   const signIn = useCallback(async (credentials: LoginRequestDTO) => {
     const response = await login(credentials);
+    await saveUserProfile(response.user);
     setUser(response.user);
     setIsAuthenticated(true);
   }, []);
 
   const signOut = useCallback(async () => {
     await clearAccessToken();
+    await clearUserProfile();
     setUser(null);
     setIsAuthenticated(false);
   }, []);
