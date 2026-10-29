@@ -7,6 +7,7 @@ interface AccessGrantListProps {
   grants: AccessGrantResponseDTO[];
   isLoading: boolean;
   isUpdating: boolean;
+  canAccept: boolean;
   hasActiveFilters: boolean;
   onAccept: (id: string) => void;
   onRevoke: (id: string) => void;
@@ -16,6 +17,7 @@ export function AccessGrantList({
   grants,
   isLoading,
   isUpdating,
+  canAccept,
   hasActiveFilters,
   onAccept,
   onRevoke,
@@ -49,6 +51,7 @@ export function AccessGrantList({
           key={grant.id}
           grant={grant}
           isUpdating={isUpdating}
+          canAccept={canAccept}
           onAccept={onAccept}
           onRevoke={onRevoke}
         />
