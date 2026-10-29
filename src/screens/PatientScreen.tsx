@@ -1,8 +1,16 @@
-import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, Text, TouchableOpacity } from "react-native";
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AccessCredentialsSection } from "../components/patient/AccessCredentialsSection";
 import { ContactInformationSection } from "../components/patient/ContactInformationSection";
 import { PersonalInformationSection } from "../components/patient/PersonalInformationSection";
+import { RegistrationFeedbackModal } from "../components/RegistrationFeedbackModal";
 import { usePatientRegistration } from "../hooks/usePatientRegistration";
 import { styles } from "../styles/PatientStyle";
 
@@ -14,6 +22,7 @@ export function PatientScreen() {
     errorMessage,
     successMessage,
     submit,
+    clearFeedback,
   } = usePatientRegistration();
 
   return (
@@ -30,17 +39,6 @@ export function PatientScreen() {
           <Text style={styles.subtitle}>
             Complete el formulario para registrar un nuevo paciente
           </Text>
-
-          {errorMessage ? (
-            <Text accessibilityRole="alert" style={styles.errorMessage}>
-              {errorMessage}
-            </Text>
-          ) : null}
-          {successMessage ? (
-            <Text accessibilityRole="alert" style={styles.successMessage}>
-              {successMessage}
-            </Text>
-          ) : null}
 
           <PersonalInformationSection
             values={values}
@@ -61,9 +59,13 @@ export function PatientScreen() {
               <Text style={styles.submitButtonText}>Registrar Paciente</Text>
             )}
           </TouchableOpacity>
-
         </ScrollView>
       </KeyboardAvoidingView>
+      <RegistrationFeedbackModal
+        type={errorMessage ? "error" : "success"}
+        message={errorMessage || successMessage}
+        onClose={clearFeedback}
+      />
     </SafeAreaView>
   );
 }

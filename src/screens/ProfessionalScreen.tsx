@@ -10,6 +10,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { AccessCredentialsSection } from "../components/professional/AccessCredentialsSection";
 import { PersonalInformationSection } from "../components/professional/PersonalInformationSection";
 import { ProfessionalInformationSection } from "../components/professional/ProfessionalInformationSection";
+import { RegistrationFeedbackModal } from "../components/RegistrationFeedbackModal";
 import { useProfessionalRegistration } from "../hooks/useProfessionalRegistration";
 import { styles } from "../styles/PatientStyle";
 
@@ -21,6 +22,7 @@ export function ProfessionalScreen() {
     errorMessage,
     successMessage,
     submit,
+    clearFeedback,
   } = useProfessionalRegistration();
 
   return (
@@ -37,17 +39,6 @@ export function ProfessionalScreen() {
           <Text style={styles.subtitle}>
             Complete el formulario para registrar un profesional médico
           </Text>
-
-          {errorMessage ? (
-            <Text accessibilityRole="alert" style={styles.errorMessage}>
-              {errorMessage}
-            </Text>
-          ) : null}
-          {successMessage ? (
-            <Text accessibilityRole="alert" style={styles.successMessage}>
-              {successMessage}
-            </Text>
-          ) : null}
 
           <PersonalInformationSection
             values={values}
@@ -76,6 +67,11 @@ export function ProfessionalScreen() {
 
         </ScrollView>
       </KeyboardAvoidingView>
+      <RegistrationFeedbackModal
+        type={errorMessage ? "error" : "success"}
+        message={errorMessage || successMessage}
+        onClose={clearFeedback}
+      />
     </SafeAreaView>
   );
 }

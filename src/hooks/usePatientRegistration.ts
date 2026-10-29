@@ -35,6 +35,11 @@ export function usePatientRegistration() {
     [],
   );
 
+  const clearFeedback = useCallback(() => {
+    setErrorMessage("");
+    setSuccessMessage("");
+  }, []);
+
   const submit = useCallback(async () => {
     const registration = preparePatientRegistration(values);
     if (!registration.success) {
@@ -75,5 +80,6 @@ export function usePatientRegistration() {
     errorMessage,
     successMessage,
     submit,
+    clearFeedback,
   };
 }

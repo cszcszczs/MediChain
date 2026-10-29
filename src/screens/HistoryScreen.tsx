@@ -9,6 +9,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { RegistrationFeedbackModal } from "../components/RegistrationFeedbackModal";
 import { AdditionalNotesSection } from "../components/history/AdditionalNotesSection";
 import { AttachmentsSection } from "../components/history/AttachmentsSection";
 import { DiagnosisSection } from "../components/history/DiagnosisSection";
@@ -40,23 +41,10 @@ export function HistoryScreen() {
 
           {form.patientError ? (
             <View>
-              <Text accessibilityRole="alert" style={styles.errorMessage}>
-                {form.patientError}
-              </Text>
               <TouchableOpacity onPress={() => void form.refreshPatients()}>
                 <Text style={styles.addLink}>Reintentar carga de pacientes</Text>
               </TouchableOpacity>
             </View>
-          ) : null}
-          {form.errorMessage ? (
-            <Text accessibilityRole="alert" style={styles.errorMessage}>
-              {form.errorMessage}
-            </Text>
-          ) : null}
-          {form.successMessage ? (
-            <Text accessibilityRole="alert" style={styles.successMessage}>
-              {form.successMessage}
-            </Text>
           ) : null}
 
           <PatientInformationSection
@@ -133,6 +121,23 @@ export function HistoryScreen() {
 
         </ScrollView>
       </KeyboardAvoidingView>
+      <RegistrationFeedbackModal
+        type={
+          form.errorMessage || form.patientError ? "error" : "success"
+        }
+        title={
+          form.patientError
+            ? "No se pudieron cargar pacientes"
+            : form.errorMessage
+              ? "No se pudo guardar"
+              : "Historial guardado"
+        }
+        message={form.errorMessage || form.patientError || form.successMessage}
+        onClose={() => {
+          form.clearFeedback();
+          form.clearPatientError();
+        }}
+      />
     </SafeAreaView>
   );
 }
