@@ -27,6 +27,7 @@ export class ApiError extends Error {
 export interface ApiRequestOptions extends RequestInit {
   authenticated?: boolean;
   allowEmptyResponse?: boolean;
+  nativeMultipart?: boolean;
 }
 
 export async function saveAccessToken(token: string): Promise<void> {
@@ -149,6 +150,52 @@ function getServerErrorMessage(payload: unknown, status: number): string {
   return `La solicitud falló (${status}).`;
 }
 
+function sendNativeMultipart(
+  url: string,
+  method: string,
+  headers: Headers,
+  body: FormData,
+  signal?: AbortSignal | null,
+): Promise<Pick<Response, "ok" | "status" | "text">> {
+  return new Promise((resolve, reject) => {
+    const request = new XMLHttpRequest();
+    const cleanup = () => signal?.removeEventListener("abort", abortRequest);
+    const abortRequest = () => request.abort();
+
+    if (signal?.aborted) {
+      reject(new DOMException("La solicitud fue cancelada.", "AbortError"));
+      return;
+    }
+
+    request.open(method, url, true);
+    headers.forEach((value, key) => request.setRequestHeader(key, value));
+
+    request.onload = () => {
+      cleanup();
+      const responseText = request.responseText;
+      resolve({
+        ok: request.status >= 200 && request.status < 300,
+        status: request.status,
+        text: async () => responseText,
+      });
+    };
+    request.onerror = () => {
+      cleanup();
+      reject(new TypeError("Network request failed"));
+    };
+    request.ontimeout = () => {
+      cleanup();
+      reject(new TypeError("Network request timed out"));
+    };
+    request.onabort = () => {
+      cleanup();
+      reject(new DOMException("La solicitud fue cancelada.", "AbortError"));
+    };
+    signal?.addEventListener("abort", abortRequest, { once: true });
+    request.send(body);
+  });
+}
+
 export async function apiRequest<T>(
   path: string,
   parseResponse: (payload: unknown) => T,
@@ -163,6 +210,7 @@ export async function apiRequest<T>(
   const {
     authenticated = true,
     allowEmptyResponse = false,
+    nativeMultipart = false,
     ...requestInit
   } = options;
   const headers = new Headers(requestInit.headers);
@@ -181,12 +229,27 @@ export async function apiRequest<T>(
     headers.set("Authorization", `Bearer ${token}`);
   }
 
-  let response: Response;
+  let response: Pick<Response, "ok" | "status" | "text">;
   try {
-    response = await fetch(`${API_BASE_URL}/${path.replace(/^\/+/, "")}`, {
-      ...requestInit,
-      headers,
-    });
+    const url = `${API_BASE_URL}/${path.replace(/^\/+/, "")}`;
+    if (
+      nativeMultipart &&
+      Platform.OS !== "web" &&
+      requestInit.body instanceof FormData
+    ) {
+      response = await sendNativeMultipart(
+        url,
+        requestInit.method ?? "GET",
+        headers,
+        requestInit.body,
+        requestInit.signal,
+      );
+    } else {
+      response = await fetch(url, {
+        ...requestInit,
+        headers,
+      });
+    }
   } catch (error) {
     if (error instanceof TypeError) {
       throw new ApiError(

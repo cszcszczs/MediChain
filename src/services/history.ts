@@ -270,5 +270,6 @@ export async function createHistory(
   return apiRequest("history", parseHistoryResponse, {
     method: "POST",
     body: formData,
+    nativeMultipart: true,
   });
 }
